@@ -46,16 +46,16 @@ int main()
 	/*mvwprintw(win, 2, 15, stux2);
 	mvwprintw(win, 3.1, 15, stux3);
 	mvwprintw(win, 4, 15, stux4);*/
-    mvwprintw(win, 5, 15, "Stuxnet V1.0 - Group D2");
+  mvwprintw(win, 5, 15, "Stuxnet V1.0 - Group D2");
 
 	wattroff(win, COLOR_PAIR(1));
 
 	init_pair(2, COLOR_CYAN, 0);
-	wattron(win, COLOR_PAIR(2));
+	
 	/*mvwprintw(win, 7, 2, "1. Login");
 	mvwprintw(win, 10, 2, "2. Register");*/
 	wattroff(win, COLOR_PAIR(1));
-
+  wattron(win, COLOR_PAIR(2));
 	wrefresh(win); //refreshes specfic window
 	keypad(win, true);
 
