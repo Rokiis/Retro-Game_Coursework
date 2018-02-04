@@ -22,3 +22,5 @@ sudo apt-get install libncurses5-dev libncursesw5-dev - installs curses library 
 https://jdonaldmccarthy.wordpress.com/2014/09/05/how-to-set-up-pdcurses-in-visual-studio-2013-c/ - curses library for windows with guide for visual studio
 
 https://github.com/fundamelon/terminal-game-tutorial - cool game using curses library
+
+http://www.kammerl.de/ascii/AsciiSignature.php - select font ALPHABET for cool ascii that actually works. 
