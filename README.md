@@ -9,14 +9,14 @@
 
 [Group Discord](https://discord.gg/xFTEtCm)
 
-[curses library for windows with guide for visual studio](https://jdonaldmccarthy.wordpress.com/2014/09/05/how-to-set-up-pdcurses-in-visual-studio-2013-c/)
+[Curses library for windows with guide for visual studio](https://jdonaldmccarthy.wordpress.com/2014/09/05/how-to-set-up-pdcurses-in-visual-studio-2013-c/)
 
-[cool game using curses library](https://github.com/fundamelon/terminal-game-tutorial)
+[Cool example game using curses library](https://github.com/fundamelon/terminal-game-tutorial)
 
-[select font ALPHABET for cool ascii that actually works. ](http://www.kammerl.de/ascii/AsciiSignature.php)
+[ASCII Style Text Generator (choose font "Alphabet")](http://www.kammerl.de/ascii/AsciiSignature.php)
 
 
-Useful for GNU compiler / c++ / ncurses library
+### Useful for GNU compiler / c++ / ncurses library
 
 g++ --std=c++14 FILENAME.cpp -o PROGRAMNAME - compiles
   
