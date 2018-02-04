@@ -2,162 +2,233 @@
 #include <iostream>
 #include <string>
 using namespace std;
-
+bool mainMenuLoop = false;
+void printMiddle(WINDOW * win, int y, int x, int upDown, string asd) //function I created to print text within a window at the centre. aesthetics n shit. 
+{
+	int getLength = asd.length();									 //int upDown is buggy. 9 = top of screen, play around with it. 
+	int newY = (y / 2) - upDown;
+	int newX = (x - getLength) / 2;
+	mvwprintw(win, newY, newX, asd.c_str());
+}
 int main()
-{        
-	initscr();	
-	noecho(); //turns off showing what key the user pressed
-	start_color(); //enables colours 
-	int height, width, start_y, start_x;
-	height = 20;
-	width = 70;
-	start_y = 1;
-	start_x = 1;
-
-	WINDOW * win = newwin(height, width, start_y, start_x); //create window
-	refresh(); //refresh screen to allow window
-
-	
-	//box(win, 0, 0); //create box, takes characters to form box edges e.g char c = 'g'; box(win, (int)c, 0);
-	int left, right, top, bottom, tlc, trc, blc, brc;
-	/*char lr = '|';
-	char corners = '+';			//used for setting specific characters for border
-	char tb = '-';*/
-	left = right = 0;
-	top = bottom = 0;
-	tlc = trc = blc = brc = 0;
-	wborder(win, left, right, top, bottom, tlc, trc, blc, brc);
-	
-	/*char* stux1 = "___ _____ _   ___  __  _  _ ___ _____";
-	char* stux2 = "/ __|_   _| | | \ \/ / | \| | __|_   _|";
-	char* stux3 = "\__ \ | | | |_| |>  < | .` | _|  | |";				//play around with this to get it to work
-	char* stux4 = "|___/ |_|  \___//_/\_\ |_|\_|___| |_|";*/
-
-	/*char* stux1 = "___ _____ _   ___  __  _  _ ___ _____";
-	char* stux2 = "/ __|_   _| | | \ \/ / | \| | __|_   _|";
-	char* stux3 = "\__ \ | | | |_| |>  < | .` | _|  | |";					//won't work on codio, works on win10 vis 2017 with pdcurses
-	char* stux4 = "|___/ |_|  \___//_/\_\ |_|\_|___| |_|";*/
-	
-	
-
-	init_pair(1, COLOR_GREEN, 0);
-	wattron(win, COLOR_PAIR(1));
-	mvwprintw(win, 1.1, 15, "STUX NET");
-	/*mvwprintw(win, 2, 15, stux2);
-	mvwprintw(win, 3.1, 15, stux3);
-	mvwprintw(win, 4, 15, stux4);*/
-  mvwprintw(win, 5, 15, "Stuxnet V1.0 - Group D2");
-
-	wattroff(win, COLOR_PAIR(1));
-
-	init_pair(2, COLOR_CYAN, 0);
-	
-	/*mvwprintw(win, 7, 2, "1. Login");
-	mvwprintw(win, 10, 2, "2. Register");*/
-	wattroff(win, COLOR_PAIR(1));
-  wattron(win, COLOR_PAIR(2));
-	wrefresh(win); //refreshes specfic window
-	keypad(win, true);
-
-	string choices[2] = { "LOGIN", "REGISTER" };
-	int choice;
-	int highlight = 0;
-	while (1)
+{
+	while (!mainMenuLoop)
 	{
-		for (int i = 0; i < 2; i++)
+		initscr();
+		noecho(); //turns off showing what key the user pressed
+		start_color(); //enables colours 
+		int height, width, start_y, start_x;
+		height = 20;
+		width = 70;
+		start_y = 1;
+		start_x = 1;
+
+		WINDOW * mainMenu = newwin(height, width, start_y, start_x); //create window
+		refresh(); //refresh screen to allow window
+
+				   //box(win, 0, 0); //create box, takes characters to form box edges e.g char c = 'g'; box(win, (int)c, 0);
+		int left, right, top, bottom, tlc, trc, blc, brc;
+		/*char lr = '|';
+		char corners = '+';			//used for setting specific characters for border
+		char tb = '-';*/
+		left = right = 0;
+		top = bottom = 0;
+		tlc = trc = blc = brc = 0;
+		wborder(mainMenu, left, right, top, bottom, tlc, trc, blc, brc); //creates border (aka box) around window, more efficient than box command
+		
+		string stux1 = " SSS  TTTTTT U   U X   X  N   N EEEE TTTTTT";
+		string stux2 = "S       TT   U   U  X X   NN  N E      TT  ";
+		string stux3 = " SSS    TT   U   U   X    N N N EEE    TT  ";					//won't work on codio, works on win10 vis 2017 with pdcurses
+		string stux4 = "    S   TT   U   U  X X   N  NN E      TT  ";
+		string stux5 = "SSSS    TT    UUU  X   X  N   N EEEE   TT  ";
+		int mainMaxY, mainMaxX;
+		getmaxyx(mainMenu, mainMaxY, mainMaxX);
+
+		init_pair(1, COLOR_GREEN, 0);
+		wattron(mainMenu, COLOR_PAIR(1));
+	
+		printMiddle(mainMenu, mainMaxY, mainMaxX, 9, stux1);
+		printMiddle(mainMenu, mainMaxY, mainMaxX, 8, stux2);
+		printMiddle(mainMenu, mainMaxY, mainMaxX, 7, stux3);
+		printMiddle(mainMenu, mainMaxY, mainMaxX, 6, stux4);
+		printMiddle(mainMenu, mainMaxY, mainMaxX, 5, stux5);
+
+
+
+
+		mvwprintw(mainMenu, 6, 15, "Stuxnet V1.0 - Group D2");
+		wattroff(mainMenu, COLOR_PAIR(1));
+		init_pair(2, COLOR_CYAN, 0);
+		wattron(mainMenu, COLOR_PAIR(2));
+		/*mvwprintw(win, 7, 2, "1. Login");
+		mvwprintw(win, 10, 2, "2. Register");*/
+		wattroff(mainMenu, COLOR_PAIR(1));
+		wrefresh(mainMenu); //refreshes specfic window
+		keypad(mainMenu, true);			//must be enabled for usage of arrow keys (see below)
+		string mainMenuChoices[3] = { "PLAY GAME", "INSTRUCTIONS", "EXIT" };			//strings used to form options of selection 
+		int mainMenuChoice;
+		int mainMenuHighlight = 0;
+		while (1)				//while loop so that unless conditions are met, choice must be made
 		{
-			if (i == highlight)
-				wattron(win, A_REVERSE);
-			mvwprintw(win, i + 7, 2, choices[i].c_str());
-			wattroff(win, A_REVERSE);
+			for (int i = 0; i < 3; i++)
+			{
+				if (i == mainMenuHighlight)
+					wattron(mainMenu, A_REVERSE);
+				mvwprintw(mainMenu, i + 7, 3, mainMenuChoices[i].c_str()); //.c_str is so useful, allows you to convert string into const char * format
+				wattroff(mainMenu, A_REVERSE);
+			}
+			mainMenuChoice = wgetch(mainMenu);
+			switch (mainMenuChoice)
+			{
+			case KEY_UP:
+				mainMenuHighlight--;
+				if (mainMenuHighlight == -1)
+					mainMenuHighlight = 0;
+				break;
+			case KEY_DOWN:
+				mainMenuHighlight++;
+				if (mainMenuHighlight == 3)
+					mainMenuHighlight = 2;
+				break;
+			default:
+				break;
+			}
+			if (mainMenuChoice == 10)
+				break;
 		}
-		choice = wgetch(win);
-
-		switch (choice)
+		
+		string inputMainMenu = mainMenuChoices[mainMenuHighlight];
+		wrefresh(mainMenu);
+		if (inputMainMenu == "PLAY GAME")
 		{
-		case KEY_UP:
-			highlight--;
-			if (highlight == -1)
-				highlight = 0;
-			break;
-		case KEY_DOWN:
-			highlight++;
-			if (highlight == 2)
-				highlight = 1;
-			break;
-		default:
-			break;
+			bool characterCreationLoop = false;
+			while (!characterCreationLoop)
+			{
+				wrefresh(mainMenu);
+				WINDOW * characterCreation = newwin(20, 70, 1, 1);
+				refresh();
+				wborder(characterCreation, 0, 0, 0, 0, 0, 0, 0, 0);
+				wattron(characterCreation, COLOR_PAIR(1));
+				mvwprintw(characterCreation, 1, 30, "CHARACTER CREATION");
+				wattroff(characterCreation, COLOR_PAIR(1));
+				wattron(characterCreation, COLOR_PAIR(2));
+				keypad(characterCreation, true);
+				string characterCreationChoices[2] = { "ENTER YOUR NAME", "GO BACK" };
+				int characterCreationChoice;
+				int chacterCreationHighlight = 0;
+				while (1)
+				{
+					for (int k = 0; k < 2; k++)
+					{
+						if (k == chacterCreationHighlight)
+							wattron(characterCreation, A_REVERSE);
+						mvwprintw(characterCreation, k + 7, 2, characterCreationChoices[k].c_str());
+						wattroff(characterCreation, A_REVERSE);
+					}
+					characterCreationChoice = wgetch(characterCreation);
+					switch (characterCreationChoice)
+					{
+					case KEY_UP:
+						chacterCreationHighlight--;
+						if (chacterCreationHighlight == -1)
+							chacterCreationHighlight = 0;
+						break;
+					case KEY_DOWN:
+						chacterCreationHighlight++;
+						if (chacterCreationHighlight == 2)
+							chacterCreationHighlight = 1;
+						break;
+					default:
+						break;
+					}
+					if (characterCreationChoice == 10)
+						break;
+				}
+				string inputCharacterCreation = characterCreationChoices[chacterCreationHighlight];
+				wrefresh(characterCreation);
+				if (inputCharacterCreation == "ENTER YOUR NAME")
+				{
+					echo();
+					char playerSessionName[15];
+					wrefresh(characterCreation);
+					mvwprintw(characterCreation, 13, 2, "YOUR NAME:");
+					mvwscanw(characterCreation, 14, 2, "%s", playerSessionName);
+					wrefresh(characterCreation);
+					noecho();
+					mvwprintw(characterCreation, 14, 2, "YOUR NAME IS %s", playerSessionName);
+					wrefresh(characterCreation);
+					characterCreationLoop = true;
+					getch();
+
+				}
+				if (inputCharacterCreation == "GO BACK")
+				{
+					characterCreationLoop = true;
+					refresh();
+				}
+				wrefresh(characterCreation);
+			}
 		}
-		if (choice == 10)
-			break;
+		if (inputMainMenu == "EXIT")
+		{
+			mainMenuLoop = true;
+		}
+		if (inputMainMenu == "INSTRUCTIONS")
+		{
+			bool howToPlayLoop = false;
+			while (!howToPlayLoop)
+			{
+				wrefresh(mainMenu);
+				WINDOW * howToPlay = newwin(20, 70, 1, 1);
+				refresh();
+				wborder(howToPlay, 0, 0, 0, 0, 0, 0, 0, 0);
+				wattron(howToPlay, COLOR_PAIR(1));
+				mvwprintw(howToPlay, 1, 30, "INSTRUCTIONS");
+				int howToMaxY, howToMaxX;
+				getmaxyx(howToPlay, howToMaxY, howToMaxX);
+				string test = "instructions go here";
+				/*int x = test.length();
+				mvwprintw(howToPlay, howToMaxY/2, (howToMaxX-x)/2, test.c_str());*/
+				printMiddle(howToPlay, howToMaxY, howToMaxX, 1, test);
+				printMiddle(howToPlay, howToMaxY, howToMaxX, 2, test);
+				printMiddle(howToPlay, howToMaxY, howToMaxX, 3, test);
+				wattroff(howToPlay, COLOR_PAIR(1));
+				wattron(howToPlay, COLOR_PAIR(2));
+				keypad(howToPlay, true);
+				string howToPlayChoices[1] = { "GO BACK" };
+				int howToPlayChoice;
+				int howToPlayHighlight = 0;
+				while (1)
+				{
+					for (int k = 0; k < 1; k++)
+					{
+						if (k == howToPlayHighlight)
+							wattron(howToPlay, A_REVERSE);
+						mvwprintw(howToPlay, k + 7, 2, howToPlayChoices[k].c_str()); 
+						wattroff(howToPlay, A_REVERSE);
+					}
+					howToPlayChoice = wgetch(howToPlay);
+					switch (howToPlayChoice)
+					{
+					default:
+						break;
+					}
+					if (howToPlayChoice == 10)
+						break;
+				}
+				string inputCharacterCreation = howToPlayChoices[howToPlayHighlight];
+				wrefresh(howToPlay);
+				if (inputCharacterCreation == "GO BACK")
+				{
+					howToPlayLoop = true;
+					refresh();
+				}
+				wrefresh(howToPlay);
+			}
+		}
+		
 	}
-	mvwprintw(win, 15, 2, "You have selected to %s. Press any key to continue...", choices[highlight].c_str());
-	string x = choices[highlight];
-	wrefresh(win);
-	if (x == "LOGIN")
-	{
-		mvwprintw(win, 15, 2, "You have selected to login. Press any key to continue...");
-		wrefresh(win);
-		getch();
-		WINDOW * login = newwin(20, 70, 1, 1);		//creates new window
-		refresh();
-		wborder(login, 0, 0, 0, 0, 0, 0, 0, 0);		//sets window border
-		wattron(login, COLOR_PAIR(1));
-		mvwprintw(login, 1, 30, "LOGIN");
-		wattroff(login, COLOR_PAIR(1));
-		wattron(login, COLOR_PAIR(2));
-		mvwprintw(login, 7, 2, "USERNAME: ");
-		mvwprintw(login, 10, 2, "PASSWORD: ");
-		wrefresh(login);
-	}
-	if (x == "REGISTER")
-	{
-		mvwprintw(win, 15, 2, "You have selected to register. Press any key to continue...");
-		wrefresh(win);
-		getch();
-		WINDOW * register1 = newwin(20, 70, 1, 1);
-		refresh();
-		wborder(register1, 0, 0, 0, 0, 0, 0, 0, 0);
-		wattron(register1, COLOR_PAIR(1));
-		mvwprintw(register1, 1, 30, "REGISTER");
-		wattroff(register1, COLOR_PAIR(1));
-		wattron(register1, COLOR_PAIR(2));
-		mvwprintw(register1, 7, 2, "USERNAME: ");
-		mvwprintw(register1, 10, 2, "PASSWORD: ");
-    mvwprintw(register1, 13, 2, "RETYPE PASSWORD: ");
-		wrefresh(register1);
-	}
-	
-
-	/*int c = wgetch(win);
-	if (c == '1')
-	{
-		mvwprintw(win, 15, 2, "You have selected to login. Press any key to continue...");
-		wrefresh(win);
-		getch();
-		WINDOW * login = newwin(20, 70, 1, 1);		//creates new window
-		refresh();
-		wborder(login, 0, 0, 0, 0, 0, 0, 0, 0);		//sets window border
-		init_pair(3, COLOR_GREEN, 0);
-		init_pair(4, COLOR_CYAN, 0);
-		wattron(login, COLOR_PAIR(3));
-		mvwprintw(login, 1, 30, "LOGIN");
-		wattroff(login, COLOR_PAIR(3));
-		wattron(login, COLOR_PAIR(4));
-		mvwprintw(login, 7, 2, "USERNAME: ");
-		mvwprintw(login, 10, 2, "PASSWORD: ");
-		wrefresh(login);
-	}
-	if (c == '2')
-	{
-		mvwprintw(win, 15, 2, "You have selected to register. Press any key to continue...");
-		wrefresh(win);
-	}
-	*/
-
-	getch(); //wait for user input, returns int value of key
-
-	endwin();
 
 	return 0;
 }
+
