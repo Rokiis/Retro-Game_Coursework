@@ -45,6 +45,7 @@ int main()
 		getmaxyx(mainMenu, mainMaxY, mainMaxX);
 
 		init_pair(1, COLOR_GREEN, 0);
+		init_pair(69, COLOR_RED, 0);
 		wattron(mainMenu, COLOR_PAIR(1));
 	
 		printMiddle(mainMenu, mainMaxY, mainMaxX, 9, stux1);
@@ -52,12 +53,13 @@ int main()
 		printMiddle(mainMenu, mainMaxY, mainMaxX, 7, stux3);
 		printMiddle(mainMenu, mainMaxY, mainMaxX, 6, stux4);
 		printMiddle(mainMenu, mainMaxY, mainMaxX, 5, stux5);
-
-
-
-
-		mvwprintw(mainMenu, 6, 15, "Stuxnet V1.0 - Group D2");
 		wattroff(mainMenu, COLOR_PAIR(1));
+
+
+		wattron(mainMenu, COLOR_PAIR(69));
+		mvwprintw(mainMenu, 6, 22, "Stuxnet V1.0 - Group D2");
+		wattroff(mainMenu, COLOR_PAIR(69));
+		
 		init_pair(2, COLOR_CYAN, 0);
 		wattron(mainMenu, COLOR_PAIR(2));
 		/*mvwprintw(win, 7, 2, "1. Login");
