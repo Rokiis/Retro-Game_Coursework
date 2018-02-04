@@ -15,6 +15,7 @@ int main()
 	while (!mainMenuLoop)
 	{
 		initscr();
+		curs_set(0);
 		noecho(); //turns off showing what key the user pressed
 		start_color(); //enables colours 
 		int height, width, start_y, start_x;
@@ -146,12 +147,14 @@ int main()
 				if (inputCharacterCreation == "ENTER YOUR NAME")
 				{
 					echo();
+					curs_set(1);
 					char playerSessionName[15];
 					wrefresh(characterCreation);
 					mvwprintw(characterCreation, 13, 2, "YOUR NAME:");
 					mvwscanw(characterCreation, 14, 2, "%s", playerSessionName);
 					wrefresh(characterCreation);
 					noecho();
+					curs_set(0);
 					mvwprintw(characterCreation, 14, 2, "YOUR NAME IS %s", playerSessionName);
 					wrefresh(characterCreation);
 					characterCreationLoop = true;
