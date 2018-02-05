@@ -51,6 +51,9 @@ int main()
 		init_pair(1, COLOR_GREEN, 0);
 		init_pair(69, COLOR_RED, 0);	//colour initialisations
 		init_pair(2, COLOR_CYAN, 0);
+		init_pair(3, COLOR_MAGENTA, 0);
+		init_pair(4, COLOR_WHITE, 0);
+		init_pair(5, COLOR_YELLOW, 0);
 
 		wattron(mainMenu, COLOR_PAIR(1));
 		printMiddle(mainMenu, mainMaxY, mainMaxX, 9, stux1);
@@ -118,12 +121,12 @@ int main()
 				keypad(characterCreation, true);
 				string characterCreationChoices[2] = { "ENTER YOUR NAME", "GO BACK" };
 				int characterCreationChoice;
-				int chacterCreationHighlight = 0;
+				int characterCreationHighlight = 0;
 				while (1)
 				{
 					for (int k = 0; k < 2; k++)
 					{
-						if (k == chacterCreationHighlight)
+						if (k == characterCreationHighlight)
 							wattron(characterCreation, A_REVERSE);
 						mvwprintw(characterCreation, k + 7, 2, characterCreationChoices[k].c_str());
 						wattroff(characterCreation, A_REVERSE);
@@ -132,14 +135,14 @@ int main()
 					switch (characterCreationChoice)
 					{
 					case KEY_UP:
-						chacterCreationHighlight--;
-						if (chacterCreationHighlight == -1)
-							chacterCreationHighlight = 0;
+						characterCreationHighlight--;
+						if (characterCreationHighlight == -1)
+							characterCreationHighlight = 0;
 						break;
 					case KEY_DOWN:
-						chacterCreationHighlight++;
-						if (chacterCreationHighlight == 2)
-							chacterCreationHighlight = 1;
+						characterCreationHighlight++;
+						if (characterCreationHighlight == 2)
+							characterCreationHighlight = 1;
 						break;
 					default:
 						break;
@@ -147,7 +150,7 @@ int main()
 					if (characterCreationChoice == 10)
 						break;
 				}
-				string inputCharacterCreation = characterCreationChoices[chacterCreationHighlight];
+				string inputCharacterCreation = characterCreationChoices[characterCreationHighlight];
 				wrefresh(characterCreation);
 				if (inputCharacterCreation == "ENTER YOUR NAME")
 				{
@@ -159,10 +162,79 @@ int main()
 					wrefresh(characterCreation);
 					noecho();
 					curs_set(0);
-					mvwprintw(characterCreation, 14, 2, "YOUR NAME IS %s", playerSessionName.c_str());
+					mvwprintw(characterCreation, 14, 2, "WELCOME, %s. Press any key to continue...", playerSessionName.c_str());
+					
+					int playerSessionCash = 0;
+					string playerSessionStrikes = "";				//important values
+					
 					wrefresh(characterCreation);
-					characterCreationLoop = true;
 					getch();
+					bool secondScreenLoop = false;
+					while (!secondScreenLoop)
+					{
+						wrefresh(characterCreation);
+						WINDOW * secondScreenWin = newwin(20, 70, 1, 1);
+						refresh();
+						wborder(secondScreenWin, 0, 0, 0, 0, 0, 0, 0, 0);
+						wattron(secondScreenWin, COLOR_PAIR(1));
+						int secondScreenMaxY, secondScreenMaxX;
+						getmaxyx(secondScreenWin, secondScreenMaxY, secondScreenMaxX);
+						printMiddle(secondScreenWin, secondScreenMaxY, secondScreenMaxX, 9, "STUX NET");
+						wattroff(secondScreenWin, COLOR_PAIR(1));
+
+						wattron(secondScreenWin, COLOR_PAIR(4));
+						mvwprintw(secondScreenWin, 1, 2, "NAME: %s", playerSessionName.c_str());
+						wattroff(secondScreenWin, COLOR_PAIR(4));
+						wattron(secondScreenWin, COLOR_PAIR(5));
+						mvwprintw(secondScreenWin, 1, 55, "CASH: %d", playerSessionCash);
+						wattroff(secondScreenWin, COLOR_PAIR(5));
+						wattron(secondScreenWin, COLOR_PAIR(69));
+						mvwprintw(secondScreenWin, 3, 31, "STRIKES: %s", playerSessionStrikes.c_str());
+						wattroff(secondScreenWin, COLOR_PAIR(69));
+						
+						wattron(secondScreenWin, COLOR_PAIR(2));
+						keypad(secondScreenWin, true);
+						string secondScreenChoices[5] = { "INBOX", "BANK", "INVENTORY", "LEADERBOARDS", "GO BACK TO MAIN MENU"};
+						int secondScreenChoice;
+						int secondScreenHighlight = 0;
+						while (1)
+						{
+							for (int l = 0; l < 5; l++)
+							{
+								if (l == secondScreenHighlight)
+									wattron(secondScreenWin, A_REVERSE);
+								mvwprintw(secondScreenWin, l + 7, 2, secondScreenChoices[l].c_str());
+								wattroff(secondScreenWin, A_REVERSE);
+							}
+							secondScreenChoice = wgetch(secondScreenWin);
+							switch (secondScreenChoice)
+							{
+							case KEY_UP:
+								secondScreenHighlight--;
+								if (secondScreenHighlight == -1)
+									secondScreenHighlight = 0;
+								break;
+							case KEY_DOWN:
+								secondScreenHighlight++;
+								if (secondScreenHighlight == 5)
+									secondScreenHighlight = 4;
+								break;
+							default:
+								break;
+							}
+							if (secondScreenChoice == 10)
+								break;
+						}
+						string inputSecondScreen = secondScreenChoices[secondScreenHighlight];
+						wrefresh(secondScreenWin);
+						if (inputSecondScreen == "GO BACK TO MAIN MENU")
+						{
+							characterCreationLoop = true;
+							secondScreenLoop = true;
+							refresh();
+						}
+						wrefresh(secondScreenWin);
+					}
 
 
 				}
@@ -207,11 +279,11 @@ int main()
 				int howToPlayHighlight = 0;
 				while (1)
 				{
-					for (int k = 0; k < 1; k++)
+					for (int m = 0; m < 1; m++)
 					{
-						if (k == howToPlayHighlight)
+						if (m == howToPlayHighlight)
 							wattron(howToPlay, A_REVERSE);
-						mvwprintw(howToPlay, k + 7, 2, howToPlayChoices[k].c_str());
+						mvwprintw(howToPlay, m + 7, 2, howToPlayChoices[m].c_str());
 						wattroff(howToPlay, A_REVERSE);
 					}
 					howToPlayChoice = wgetch(howToPlay);
@@ -241,10 +313,7 @@ int main()
 
 
 /*
-
 karma system
 email (inbox etc)
 first minigame
-
-
 */
