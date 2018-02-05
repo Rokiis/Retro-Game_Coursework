@@ -1,3 +1,5 @@
+//d.jones
+//group d2
 #include <ncurses.h> // or #include <ncurses.h> (linux) sudo apt-get install libncurses5-dev libncursesw5-dev
 #include <iostream>
 #include <string>
