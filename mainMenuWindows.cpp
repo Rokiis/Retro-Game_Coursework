@@ -3,6 +3,7 @@
 #include "curses.h" // or #include <ncurses.h> (linux) sudo apt-get install libncurses5-dev libncursesw5-dev
 #include <iostream>
 #include <string>
+#include <algorithm>
 using namespace std;
 bool mainMenuLoop = false;
 void printMiddle(WINDOW * win, int y, int x, int upDown, string asd) //function I created to print text within a window at the centre. aesthetics n shit. 
@@ -38,7 +39,7 @@ int main()
 		top = bottom = 0;
 		tlc = trc = blc = brc = 0;
 		wborder(mainMenu, left, right, top, bottom, tlc, trc, blc, brc); //creates border (aka box) around window, more efficient than box command
-		
+
 		string stux1 = " SSS  TTTTTT U   U X   X  N   N EEEE TTTTTT";
 		string stux2 = "S       TT   U   U  X X   NN  N E      TT  ";
 		string stux3 = " SSS    TT   U   U   X    N N N EEE    TT  ";					//won't work on codio, works on win10 vis 2017 with pdcurses
@@ -62,14 +63,14 @@ int main()
 		wattron(mainMenu, COLOR_PAIR(69));
 		mvwprintw(mainMenu, 6, 22, "Stuxnet V1.0 - Group D2");
 		wattroff(mainMenu, COLOR_PAIR(69));
-		
+
 		wattron(mainMenu, COLOR_PAIR(2));
 		wrefresh(mainMenu); //refreshes specfic window
 		keypad(mainMenu, true);			//must be enabled for usage of arrow keys (see below)
 		string mainMenuChoices[3] = { "PLAY GAME", "INSTRUCTIONS", "EXIT" };			//strings used to form options of selection 
 		int mainMenuChoice;
 		int mainMenuHighlight = 0;
-		while (1)				//while loop so that unless conditions are met, choice must be made
+		while (1)		    //while loop so that unless conditions are met, choice must be made
 		{
 			for (int i = 0; i < 3; i++)
 			{
@@ -109,7 +110,9 @@ int main()
 				refresh();
 				wborder(characterCreation, 0, 0, 0, 0, 0, 0, 0, 0);
 				wattron(characterCreation, COLOR_PAIR(1));
-				mvwprintw(characterCreation, 1, 30, "CHARACTER CREATION");
+				int creationMaxY, creationMaxX;
+				getmaxyx(characterCreation, creationMaxY, creationMaxX);
+				printMiddle(characterCreation, creationMaxY, creationMaxX, 9, "CHARACTER CREATION");
 				wattroff(characterCreation, COLOR_PAIR(1));
 				wattron(characterCreation, COLOR_PAIR(2));
 				keypad(characterCreation, true);
@@ -150,17 +153,18 @@ int main()
 				{
 					echo();
 					curs_set(1);
-					char playerSessionName[15];
+					string playerSessionName;
 					wrefresh(characterCreation);
-					mvwprintw(characterCreation, 13, 2, "YOUR NAME:");
-					mvwscanw(characterCreation, 14, 2, "%s", playerSessionName);
+					mvwscanw(characterCreation, 14, 2, "%s", playerSessionName.c_str());
 					wrefresh(characterCreation);
 					noecho();
 					curs_set(0);
-					mvwprintw(characterCreation, 14, 2, "YOUR NAME IS %s", playerSessionName);
+					mvwprintw(characterCreation, 14, 2, "YOUR NAME IS %s", playerSessionName.c_str());
 					wrefresh(characterCreation);
 					characterCreationLoop = true;
 					getch();
+
+
 				}
 				if (inputCharacterCreation == "GO BACK")
 				{
@@ -184,7 +188,9 @@ int main()
 				refresh();
 				wborder(howToPlay, 0, 0, 0, 0, 0, 0, 0, 0);
 				wattron(howToPlay, COLOR_PAIR(1));
-				mvwprintw(howToPlay, 1, 30, "INSTRUCTIONS");
+				int instructionMaxY, instructionMaxX;
+				getmaxyx(howToPlay, instructionMaxY, instructionMaxX);
+				printMiddle(howToPlay, instructionMaxY, instructionMaxX, 9, "INSTRUCTIONS");
 				int howToMaxY, howToMaxX;
 				getmaxyx(howToPlay, howToMaxY, howToMaxX);
 				string test = "instructions go here";
@@ -205,7 +211,7 @@ int main()
 					{
 						if (k == howToPlayHighlight)
 							wattron(howToPlay, A_REVERSE);
-						mvwprintw(howToPlay, k + 7, 2, howToPlayChoices[k].c_str()); 
+						mvwprintw(howToPlay, k + 7, 2, howToPlayChoices[k].c_str());
 						wattroff(howToPlay, A_REVERSE);
 					}
 					howToPlayChoice = wgetch(howToPlay);
@@ -227,9 +233,18 @@ int main()
 				wrefresh(howToPlay);
 			}
 		}
-		
+
 	}
 
 	return 0;
 }
 
+
+/*
+
+karma system
+email (inbox etc)
+first minigame
+
+
+*/
