@@ -185,7 +185,7 @@ void listenInput() {
 }
 
 
-void Input() {
+/*void Input() {
 	if (_kbhit()) {
 		switch (_getch()) {
 		case 'a':
@@ -196,7 +196,7 @@ void Input() {
 			break;
 		}
 	}
-}
+}*/
 ////////////////////
 
 bricks myBrks;
