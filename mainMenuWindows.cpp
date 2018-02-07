@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <vector>
 using namespace std;
 bool mainMenuLoop = false;
 void printMiddle(WINDOW * win, int y, int x, int upDown, string asd) //function I created to print text within a window at the centre. aesthetics n shit. 
@@ -15,6 +16,9 @@ void printMiddle(WINDOW * win, int y, int x, int upDown, string asd) //function 
 }
 int main()
 {
+	string playerSessionName;
+	int playerSessionCash = 0;
+	string playerSessionStrikes = "";				//important values
 	while (!mainMenuLoop)
 	{
 		initscr();
@@ -88,12 +92,12 @@ int main()
 			case KEY_UP:
 				mainMenuHighlight--;
 				if (mainMenuHighlight == -1)
-					mainMenuHighlight = 0;
+					mainMenuHighlight = 2;
 				break;
 			case KEY_DOWN:
 				mainMenuHighlight++;
 				if (mainMenuHighlight == 3)
-					mainMenuHighlight = 2;
+					mainMenuHighlight = 0;
 				break;
 			default:
 				break;
@@ -154,24 +158,45 @@ int main()
 				wrefresh(characterCreation);
 				if (inputCharacterCreation == "ENTER YOUR NAME")
 				{
-					echo();
-					curs_set(1);
-					string playerSessionName;
-					wrefresh(characterCreation);
-					mvwscanw(characterCreation, 14, 2, "%s", playerSessionName.c_str());
-					wrefresh(characterCreation);
-					noecho();
-					curs_set(0);
-					mvwprintw(characterCreation, 14, 2, "WELCOME, %s. Press any key to continue...", playerSessionName.c_str());
-					
-					int playerSessionCash = 0;
-					string playerSessionStrikes = "";				//important values
-					
-					wrefresh(characterCreation);
-					getch();
+					bool nameSelectionLoop = false;
+					while(!nameSelectionLoop)
+					{ 
+						echo();
+						curs_set(1);
+						wrefresh(characterCreation);
+						mvwscanw(characterCreation, 14, 2, "%s", playerSessionName.c_str());
+						wrefresh(characterCreation);
+						string playerSessionNameT = playerSessionName.c_str();
+						int playerLength = playerSessionNameT.length();
+						wrefresh(characterCreation);
+						
+						if (playerLength > 15)
+						{ 
+							wrefresh(characterCreation);
+							mvwprintw(characterCreation, 12, 2, "NAME MUST BE SHORTER THAN 15 CHARACTERS");		//look to change (doesn't catch error)
+							characterCreationLoop = true;
+							refresh();
+
+				
+						}
+						else
+						{ 
+							wrefresh(characterCreation);
+							noecho();
+							curs_set(0);
+							mvwprintw(characterCreation, 14, 2, "WELCOME, %s. Press any key to continue...", playerSessionName.c_str());
+							wrefresh(characterCreation);
+							nameSelectionLoop = true;
+							getch();
+						}
+						
+						
+					}
+
 					bool secondScreenLoop = false;
 					while (!secondScreenLoop)
 					{
+						
 						wrefresh(characterCreation);
 						WINDOW * secondScreenWin = newwin(20, 70, 1, 1);
 						refresh();
@@ -191,10 +216,10 @@ int main()
 						wattron(secondScreenWin, COLOR_PAIR(69));
 						mvwprintw(secondScreenWin, 3, 31, "STRIKES: %s", playerSessionStrikes.c_str());
 						wattroff(secondScreenWin, COLOR_PAIR(69));
-						
+
 						wattron(secondScreenWin, COLOR_PAIR(2));
 						keypad(secondScreenWin, true);
-						string secondScreenChoices[5] = { "INBOX", "BANK", "INVENTORY", "LEADERBOARDS", "GO BACK TO MAIN MENU"};
+						string secondScreenChoices[5] = { "INBOX", "BANK", "INVENTORY", "LEADERBOARDS", "GO BACK TO MAIN MENU" };
 						int secondScreenChoice;
 						int secondScreenHighlight = 0;
 						while (1)
@@ -212,12 +237,12 @@ int main()
 							case KEY_UP:
 								secondScreenHighlight--;
 								if (secondScreenHighlight == -1)
-									secondScreenHighlight = 0;
+									secondScreenHighlight = 4;
 								break;
 							case KEY_DOWN:
 								secondScreenHighlight++;
 								if (secondScreenHighlight == 5)
-									secondScreenHighlight = 4;
+									secondScreenHighlight = 0;
 								break;
 							default:
 								break;
@@ -227,6 +252,10 @@ int main()
 						}
 						string inputSecondScreen = secondScreenChoices[secondScreenHighlight];
 						wrefresh(secondScreenWin);
+
+
+				
+
 						if (inputSecondScreen == "GO BACK TO MAIN MENU")
 						{
 							characterCreationLoop = true;
