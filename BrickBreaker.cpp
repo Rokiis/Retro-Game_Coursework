@@ -12,6 +12,8 @@ const int W = 50;           //game field size
 const int H = 20;
 int score;
 int board[100][100];
+enum eDirection { STOP = 0, LEFT, RIGHT}; //movement
+eDirection dir;
 
 
 
@@ -134,7 +136,7 @@ public:
 	int length;
 	void init() {
 		this->x = 12;
-		this->length = 106;
+		this->length = 16;
 		for (int i = this->x; i<this->x + this->length; i++) { drawPoint(i, H - 2, 4); }
 	}
 	void moveL() {
@@ -181,6 +183,20 @@ void listenInput() {
 		}
 	}
 }
+
+
+void Input() {
+	if (_kbhit()) {
+		switch (_getch()) {
+		case 'a':
+			dir = LEFT;
+			break;
+		case 'd':
+			dir = RIGHT;
+			break;
+		}
+	}
+}
 ////////////////////
 
 bricks myBrks;
@@ -197,38 +213,36 @@ void startGame() {
 	myBall = ball();
 	myBall.draw();
 	myBrks.init(7, 4);
+
 	while (onPlay) {
 		myBall.move();
 		myBall.checkbounce();
 		myBall.checkcollision();
 		myBall.checkbound(onPlay, lose);
-	}
 
-	for (int j = 0; j < H; j++) {
-		for (int i = 0; i < W; i++) {
-			gotoXY(i, j);
-			if (board[i][j] == 1) { cout << "0"; }
-			else if (board[i][j] == 2) { cout << "0"; }
-			else if (board[i][j] == 3) { cout << "0"; }
-			else if (board[i][j] == 4) { cout << "0"; }
-			else { cout << " "; }
+
+		for (int j = 0; j < H; j++) {
+			for (int i = 0; i < W; i++) {
+				gotoXY(i, j);
+				if (board[i][j] == 1) { cout << "8"; }
+				else if (board[i][j] == 2) { cout << "0"; }
+				else if (board[i][j] == 3) { cout << "0"; }
+				else if (board[i][j] == 4) { cout << "0"; }
+				else { cout << " "; }
+			}
 		}
-	}
 
-	gotoXY(45, 4);
-	cout << "SCORE:" << score;
-	if (lose == 1) {
-		system("cls");
-		drawBorder();
-		gotoXY(10, 6); cout << "GAME OVER!";
-		gotoXY(10, 7); cout << "SCORE:" << score;
-		Sleep(3000);
+		gotoXY(65, 4);
+		cout << "SCORE:" << score;
 	}
 }
+	//
 
 
 int main() {
+	thread second(listenInput);
+	Input();
 	startGame();
-	Sleep(1000);
+	second.detach();
 	return 0;
 }
