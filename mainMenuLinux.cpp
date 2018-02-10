@@ -88,12 +88,12 @@ int main()
 			case KEY_UP:
 				mainMenuHighlight--;
 				if (mainMenuHighlight == -1)
-					mainMenuHighlight = 0;
+					mainMenuHighlight = 2;
 				break;
 			case KEY_DOWN:
 				mainMenuHighlight++;
 				if (mainMenuHighlight == 3)
-					mainMenuHighlight = 2;
+					mainMenuHighlight = 0;
 				break;
 			default:
 				break;
@@ -137,12 +137,12 @@ int main()
 					case KEY_UP:
 						characterCreationHighlight--;
 						if (characterCreationHighlight == -1)
-							characterCreationHighlight = 0;
+							characterCreationHighlight = 1;
 						break;
 					case KEY_DOWN:
 						characterCreationHighlight++;
 						if (characterCreationHighlight == 2)
-							characterCreationHighlight = 1;
+							characterCreationHighlight = 0;
 						break;
 					default:
 						break;
@@ -212,12 +212,12 @@ int main()
 							case KEY_UP:
 								secondScreenHighlight--;
 								if (secondScreenHighlight == -1)
-									secondScreenHighlight = 0;
+									secondScreenHighlight = 4;
 								break;
 							case KEY_DOWN:
 								secondScreenHighlight++;
 								if (secondScreenHighlight == 5)
-									secondScreenHighlight = 4;
+									secondScreenHighlight = 0;
 								break;
 							default:
 								break;
@@ -233,6 +233,71 @@ int main()
 							secondScreenLoop = true;
 							refresh();
 						}
+                        //the code nick wrote starts here
+                        if (inputSecondScreen == "INBOX")
+                        {
+                            bool inboxLoop = false;
+                            while(!inboxLoop)
+                            {
+                                wrefresh(secondScreenWin);
+                                WINDOW * inboxMenu = newwin(20, 70 , 1 , 1);
+                                refresh();
+                                wborder(inboxMenu, 0 , 0 , 0 , 0 , 0 , 0 , 0, 0);
+                                string inboxTitle = "Inbox";
+                                int inboxMaxY, inboxMaxX;
+                                getmaxyx(inboxMenu, inboxMaxY, inboxMaxX);
+                                
+                                wattron(inboxMenu, COLOR_PAIR(1));
+                                printMiddle(inboxMenu, inboxMaxY, inboxMaxX, 9, inboxTitle);
+                                wattroff(inboxMenu, COLOR_PAIR(1));
+                                
+                                wattron(inboxMenu, COLOR_PAIR(2));
+                                keypad(inboxMenu, true);
+                                string inboxMenuOptions[4] = {"Email 1", "Email 2", "Email 3","GO BACK"};
+                                int inboxMenuChoice;
+                                int inboxMenuHighlight = 0;
+                                
+                                while(1)
+                                {
+                                    for(int i = 0; i < 4; i++)
+                                    {
+                                        if( i == inboxMenuHighlight)
+                                            wattron(inboxMenu, A_STANDOUT);
+                                        mvwprintw(inboxMenu, i + 7, 3, inboxMenuOptions[i].c_str());
+                                        wattroff(inboxMenu, A_STANDOUT);    
+                                    }
+                                    inboxMenuChoice = wgetch(inboxMenu);
+                                    switch(inboxMenuChoice)
+                                    {
+                                        case KEY_UP:
+                                            inboxMenuHighlight--;
+                                            if(inboxMenuHighlight == -1)
+                                                inboxMenuHighlight = 3;
+                                            break;
+                                        case KEY_DOWN:
+                                            inboxMenuHighlight++;
+                                            if(inboxMenuHighlight == 4)
+                                                inboxMenuHighlight == 0;
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    if(inboxMenuChoice == 10)
+                                        break;
+                                    string inboxMenuInput = inboxMenuOptions[inboxMenuHighlight];
+                                    wrefresh(inboxMenu);
+                                    if(inboxMenuInput =="GO BACK")
+                                    {
+                                        inboxLoop = true;
+                                        refresh();
+                                    }
+                                    
+                                }
+                            }
+                            
+                            
+                        }
+                        //the code nick wrote ends here
 						wrefresh(secondScreenWin);
 					}
 
@@ -249,6 +314,7 @@ int main()
 		if (inputMainMenu == "EXIT")
 		{
 			mainMenuLoop = true;
+            		endwin();
 		}
 		if (inputMainMenu == "INSTRUCTIONS")
 		{
