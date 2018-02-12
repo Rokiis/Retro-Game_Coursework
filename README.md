@@ -24,5 +24,5 @@ g++ --std=c++14 test.cpp -o test -lcurses - compiles using curses library
 
 sudo apt-get install libncurses5-dev libncursesw5-dev - installs curses library (linux)
 
-
+tutorial for ncurses - http://www.cs.ukzn.ac.za/~hughm/os/notes/ncurses.html
 
