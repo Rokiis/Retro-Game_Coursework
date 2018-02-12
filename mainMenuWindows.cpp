@@ -4,9 +4,10 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
-#include <vector>
+#include <windows.h> //delete if using unix
 using namespace std;
 bool mainMenuLoop = false;
+
 void printMiddle(WINDOW * win, int y, int x, int upDown, string asd) //function I created to print text within a window at the centre. aesthetics n shit. 
 {
 	int getLength = asd.length();									 //int upDown is buggy. 9 = top of screen, play around with it. 
@@ -14,11 +15,9 @@ void printMiddle(WINDOW * win, int y, int x, int upDown, string asd) //function 
 	int newX = (x - getLength) / 2;
 	mvwprintw(win, newY, newX, asd.c_str());
 }
+
 int main()
 {
-	string playerSessionName;
-	int playerSessionCash = 0;
-	string playerSessionStrikes = "";				//important values
 	while (!mainMenuLoop)
 	{
 		initscr();
@@ -141,12 +140,12 @@ int main()
 					case KEY_UP:
 						characterCreationHighlight--;
 						if (characterCreationHighlight == -1)
-							characterCreationHighlight = 0;
+							characterCreationHighlight = 1;
 						break;
 					case KEY_DOWN:
 						characterCreationHighlight++;
 						if (characterCreationHighlight == 2)
-							characterCreationHighlight = 1;
+							characterCreationHighlight = 0;
 						break;
 					default:
 						break;
@@ -158,45 +157,24 @@ int main()
 				wrefresh(characterCreation);
 				if (inputCharacterCreation == "ENTER YOUR NAME")
 				{
-					bool nameSelectionLoop = false;
-					while(!nameSelectionLoop)
-					{ 
-						echo();
-						curs_set(1);
-						wrefresh(characterCreation);
-						mvwscanw(characterCreation, 14, 2, "%s", playerSessionName.c_str());
-						wrefresh(characterCreation);
-						string playerSessionNameT = playerSessionName.c_str();
-						int playerLength = playerSessionNameT.length();
-						wrefresh(characterCreation);
-						
-						if (playerLength > 15)
-						{ 
-							wrefresh(characterCreation);
-							mvwprintw(characterCreation, 12, 2, "NAME MUST BE SHORTER THAN 15 CHARACTERS");		//look to change (doesn't catch error)
-							characterCreationLoop = true;
-							refresh();
+					echo();
+					curs_set(1);
+					string playerSessionName;
+					wrefresh(characterCreation);
+					mvwscanw(characterCreation, 14, 2, "%s", playerSessionName.c_str());
+					wrefresh(characterCreation);
+					noecho();
+					curs_set(0);
+					mvwprintw(characterCreation, 14, 2, "WELCOME, %s. Press any key to continue...", playerSessionName.c_str());
 
-				
-						}
-						else
-						{ 
-							wrefresh(characterCreation);
-							noecho();
-							curs_set(0);
-							mvwprintw(characterCreation, 14, 2, "WELCOME, %s. Press any key to continue...", playerSessionName.c_str());
-							wrefresh(characterCreation);
-							nameSelectionLoop = true;
-							getch();
-						}
-						
-						
-					}
+					int playerSessionCash = 0;
+					string playerSessionStrikes = " ";				//important values
 
+					wrefresh(characterCreation);
+					getch();
 					bool secondScreenLoop = false;
 					while (!secondScreenLoop)
 					{
-						
 						wrefresh(characterCreation);
 						WINDOW * secondScreenWin = newwin(20, 70, 1, 1);
 						refresh();
@@ -252,16 +230,77 @@ int main()
 						}
 						string inputSecondScreen = secondScreenChoices[secondScreenHighlight];
 						wrefresh(secondScreenWin);
-
-
-				
-
 						if (inputSecondScreen == "GO BACK TO MAIN MENU")
 						{
 							characterCreationLoop = true;
 							secondScreenLoop = true;
 							refresh();
 						}
+						//the code nick wrote starts here
+						if (inputSecondScreen == "INBOX")
+						{
+							bool inboxLoop = false;
+							while (!inboxLoop)
+							{
+								wrefresh(secondScreenWin);
+								WINDOW * inboxMenu = newwin(20, 70, 1, 1);
+								refresh();
+								wborder(inboxMenu, 0, 0, 0, 0, 0, 0, 0, 0);
+								string inboxTitle = "Inbox";
+								int inboxMaxY, inboxMaxX;
+								getmaxyx(inboxMenu, inboxMaxY, inboxMaxX);
+
+								wattron(inboxMenu, COLOR_PAIR(1));
+								printMiddle(inboxMenu, inboxMaxY, inboxMaxX, 9, inboxTitle);
+								wattroff(inboxMenu, COLOR_PAIR(1));
+
+								wattron(inboxMenu, COLOR_PAIR(2));
+								keypad(inboxMenu, true);
+								string inboxMenuOptions[4] = { "Email 1", "Email 2", "Email 3","GO BACK" };
+								int inboxMenuChoice;
+								int inboxMenuHighlight = 0;
+
+								while (1)
+								{
+									for (int i = 0; i < 4; i++)
+									{
+										if (i == inboxMenuHighlight)
+											wattron(inboxMenu, A_STANDOUT);
+										mvwprintw(inboxMenu, i + 7, 3, inboxMenuOptions[i].c_str());
+										wattroff(inboxMenu, A_STANDOUT);
+									}
+									inboxMenuChoice = wgetch(inboxMenu);
+									switch (inboxMenuChoice)
+									{
+									case KEY_UP:
+										inboxMenuHighlight--;
+										if (inboxMenuHighlight == -1)
+											inboxMenuHighlight = 3;
+										break;
+									case KEY_DOWN:
+										inboxMenuHighlight++;
+										if (inboxMenuHighlight == 4)
+											inboxMenuHighlight == 0;
+										break;
+									default:
+										break;
+									}
+									if (inboxMenuChoice == 10)
+										break;
+									string inboxMenuInput = inboxMenuOptions[inboxMenuHighlight];
+									wrefresh(inboxMenu);
+									if (inboxMenuInput == "GO BACK")
+									{
+										inboxLoop = true;
+										refresh();
+									}
+
+								}
+							}
+
+
+						}
+						//the code nick wrote ends here
 						wrefresh(secondScreenWin);
 					}
 
@@ -278,6 +317,7 @@ int main()
 		if (inputMainMenu == "EXIT")
 		{
 			mainMenuLoop = true;
+			endwin();
 		}
 		if (inputMainMenu == "INSTRUCTIONS")
 		{
