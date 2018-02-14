@@ -1,13 +1,11 @@
 //d.jones
 //group d2
-#include "curses.h" // or #include <ncurses.h> (linux) sudo apt-get install libncurses5-dev libncursesw5-dev
+#include "curses.h"// or #include <ncurses.h> (linux) sudo apt-get install libncurses5-dev libncursesw5-dev
 #include <iostream>
 #include <string>
 #include <algorithm>
-#include <windows.h> //delete if using unix
 using namespace std;
 bool mainMenuLoop = false;
-
 void printMiddle(WINDOW * win, int y, int x, int upDown, string asd) //function I created to print text within a window at the centre. aesthetics n shit. 
 {
 	int getLength = asd.length();									 //int upDown is buggy. 9 = top of screen, play around with it. 
@@ -15,7 +13,6 @@ void printMiddle(WINDOW * win, int y, int x, int upDown, string asd) //function 
 	int newX = (x - getLength) / 2;
 	mvwprintw(win, newY, newX, asd.c_str());
 }
-
 int main()
 {
 	while (!mainMenuLoop)
@@ -280,7 +277,7 @@ int main()
 									case KEY_DOWN:
 										inboxMenuHighlight++;
 										if (inboxMenuHighlight == 4)
-											inboxMenuHighlight == 0;
+											inboxMenuHighlight = 0;
 										break;
 									default:
 										break;
