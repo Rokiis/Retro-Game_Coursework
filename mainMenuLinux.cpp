@@ -277,7 +277,7 @@ int main()
                                         case KEY_DOWN:
                                             inboxMenuHighlight++;
                                             if(inboxMenuHighlight == 4)
-                                                inboxMenuHighlight == 0;
+                                                inboxMenuHighlight = 0;
                                             break;
                                         default:
                                             break;
