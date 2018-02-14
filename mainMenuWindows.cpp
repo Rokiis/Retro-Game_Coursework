@@ -262,9 +262,9 @@ int main()
 									for (int i = 0; i < 4; i++)
 									{
 										if (i == inboxMenuHighlight)
-											wattron(inboxMenu, A_STANDOUT);
+											wattron(inboxMenu, A_REVERSE);
 										mvwprintw(inboxMenu, i + 7, 3, inboxMenuOptions[i].c_str());
-										wattroff(inboxMenu, A_STANDOUT);
+										wattroff(inboxMenu, A_REVERSE);
 									}
 									inboxMenuChoice = wgetch(inboxMenu);
 									switch (inboxMenuChoice)
