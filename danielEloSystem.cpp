@@ -34,23 +34,32 @@ int main()
 	Daniel.eloRating = 2000;
 	Simon.eloRating = 1800;
 
+	int k = 20;
 	float eloExp1, eloExp2;
 	eloExp1 = eloExpected(Daniel.eloRating, Simon.eloRating);
 	eloExp2 = eloExpected(Simon.eloRating, Daniel.eloRating);
-	int newElo1 = elo(Daniel.eloRating, eloExp1, winLoss, 20);
-	int newElo2 = elo(Simon.eloRating, eloExp2, !winLoss, 20);
+	int newElo1 = elo(Daniel.eloRating, eloExp1, winLoss, k);
+	int newElo2 = elo(Simon.eloRating, eloExp2, !winLoss, k);
+
 	cout << "Daniel elo rating = " << Daniel.eloRating << endl;
 	cout << "Simon elo rating = " << Simon.eloRating << endl;
 	cout << "Exepected score 1: " << eloExp1 << " Expected score 2: " << eloExp2 << endl;
+
 	if (winLoss == 1)
 	{
-	cout << Daniel.name << " won so new elo rating = " << newElo1 << endl;
-	cout << Simon.name << " lost so new elo rating = " << newElo2 << endl;
+		cout << Daniel.name << " won " << newElo1 - Daniel.eloRating << " points" << endl;
+		cout << Simon.name << " lost " << Simon.eloRating - newElo2 << " points" << endl;
+		cout << Daniel.name << " won, so new elo rating = " << newElo1 << endl;
+		cout << Simon.name << " lost, so new elo rating = " << newElo2 << endl;
+		
 	}
 	else
 	{
-		cout << Daniel.name << " lost so new elo rating = " << newElo1 << endl;
-		cout << Simon.name << " won so new elo rating = " << newElo2 << endl;
+		cout << Daniel.name << " lost " << Daniel.eloRating - newElo1 << " points" << endl;
+		cout << Simon.name << " won " << newElo2 - Simon.eloRating << " points" << endl;
+		cout << Daniel.name << " lost, so new elo rating = " << newElo1 << endl;
+		cout << Simon.name << " won, so new elo rating = " << newElo2 << endl;
+		
 	}
 	
 	system("pause");
@@ -58,3 +67,5 @@ int main()
 }
 
 //snake with code
+//Wie lange bist du schon in coventry?
+//Was ist dein Spezialgebeit
