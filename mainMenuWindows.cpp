@@ -1,9 +1,11 @@
 //d.jones
 //group d2
-#include "curses.h"// or #include <ncurses.h> (linux) sudo apt-get install libncurses5-dev libncursesw5-dev
+#include "curses.h" // or #include <ncurses.h> (linux) sudo apt-get install libncurses5-dev libncursesw5-dev
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <fstream>
+#include <time.h>
 using namespace std;
 bool mainMenuLoop = false;
 void printMiddle(WINDOW * win, int y, int x, int upDown, string asd) //function I created to print text within a window at the centre. aesthetics n shit. 
@@ -15,8 +17,18 @@ void printMiddle(WINDOW * win, int y, int x, int upDown, string asd) //function 
 }
 int main()
 {
+	srand(time(NULL)); //windows only - random gen per session
+
 	while (!mainMenuLoop)
 	{
+		int email1Money, email2Money, email3Money;
+		email1Money = 100;
+		email2Money = email1Money * 2;
+		email3Money = email2Money * 2;
+		string emailDetailText;
+		fstream emailDetails;
+		emailDetails.open("emails.txt");
+		emailDetails.close();  //file initilisation
 		initscr();
 		curs_set(0);
 		noecho(); //turns off showing what key the user pressed
@@ -236,6 +248,7 @@ int main()
 						//the code nick wrote starts here
 						if (inputSecondScreen == "INBOX")
 						{
+							emailDetails.open("emails.txt");
 							bool inboxLoop = false;
 							while (!inboxLoop)
 							{
@@ -256,15 +269,55 @@ int main()
 								string inboxMenuOptions[4] = { "Email 1", "Email 2", "Email 3","GO BACK" };
 								int inboxMenuChoice;
 								int inboxMenuHighlight = 0;
-
 								while (1)
 								{
 									for (int i = 0; i < 4; i++)
 									{
+										
 										if (i == inboxMenuHighlight)
 											wattron(inboxMenu, A_REVERSE);
-										mvwprintw(inboxMenu, i + 7, 3, inboxMenuOptions[i].c_str());
+										mvwprintw(inboxMenu, 5 * i + 3, 3, inboxMenuOptions[i].c_str());
 										wattroff(inboxMenu, A_REVERSE);
+										//if (inboxMenuOptions[i] != "GO BACK")
+										string emailDetailText;
+											const int randomSenderSequence[5] = { 0, 4, 8, 12, 16};
+											int randomSender1 = rand() % 5;
+											int randomSender2 = rand() % 5;
+											int randomSender3 = rand() % 5;
+
+
+											for (int emailNumber = 0; getline(emailDetails, emailDetailText) && emailNumber < 18; emailNumber++)
+											{
+												if (emailNumber == randomSenderSequence[randomSender1])			//will break on linux due to reliance on randomness
+												{ 
+												mvwprintw(inboxMenu, (5 * i + 3) + 1, 3, "Sender: %s", emailDetailText.c_str());
+												}
+												if (emailNumber == 2)
+												{
+													mvwprintw(inboxMenu, (5 * i + 3) + 2, 3, "Subject: %s", emailDetailText.c_str());
+													mvwprintw(inboxMenu, (5 * i + 3) + 3, 3, "Reward: %d", email1Money);
+												}
+												if (emailNumber == randomSenderSequence[randomSender2])
+												{
+													mvwprintw(inboxMenu, (5 * i + 3) + 6, 3, "Sender: %s", emailDetailText.c_str());
+												}
+												if (emailNumber == 6)
+												{
+													mvwprintw(inboxMenu, (5 * i + 3) + 7, 3, "Subject: %s", emailDetailText.c_str());
+													mvwprintw(inboxMenu, (5 * i + 3) + 8, 3, "Reward: %d", email2Money);
+												}
+											
+												if (emailNumber == randomSenderSequence[randomSender3])
+												{
+													mvwprintw(inboxMenu, (5 * i + 3) + 11, 3, "Sender: %s", emailDetailText.c_str());
+												}
+												if (emailNumber == 10)
+												{
+													mvwprintw(inboxMenu, (5 * i + 3) + 12, 3, "Subject: %s", emailDetailText.c_str());
+													mvwprintw(inboxMenu, (5 * i + 3) + 13, 3, "Reward: %d", email3Money);
+
+												}
+											}
 									}
 									inboxMenuChoice = wgetch(inboxMenu);
 									switch (inboxMenuChoice)
@@ -284,10 +337,13 @@ int main()
 									}
 									if (inboxMenuChoice == 10)
 										break;
+
 									string inboxMenuInput = inboxMenuOptions[inboxMenuHighlight];
 									wrefresh(inboxMenu);
+									
 									if (inboxMenuInput == "GO BACK")
 									{
+										emailDetails.close();
 										inboxLoop = true;
 										refresh();
 									}
