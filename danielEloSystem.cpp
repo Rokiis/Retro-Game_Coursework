@@ -21,51 +21,51 @@ public:
 	float eloRating;
 };
 
+
 int main()
 {
+	
+	
 	srand(time(NULL));
 	int K = 20;
 	int winLoss = rand() % 2;
 	cout << winLoss << endl;
 
-	Player Daniel, Simon;
-	Daniel.name = "Daniel";
-	Simon.name = "Simon";
-	Daniel.eloRating = 2000;
-	Simon.eloRating = 1800;
+	Player Player1, Player2;
+	Player1.name = "Daniel";
+	Player2.name = "Hugh";
+	Player1.eloRating = 1600;
+	Player2.eloRating = 1400;
 
 	int k = 20;
 	float eloExp1, eloExp2;
-	eloExp1 = eloExpected(Daniel.eloRating, Simon.eloRating);
-	eloExp2 = eloExpected(Simon.eloRating, Daniel.eloRating);
-	int newElo1 = elo(Daniel.eloRating, eloExp1, winLoss, k);
-	int newElo2 = elo(Simon.eloRating, eloExp2, !winLoss, k);
+	eloExp1 = eloExpected(Player1.eloRating, Player2.eloRating);
+	eloExp2 = eloExpected(Player2.eloRating, Player1.eloRating);
+	int newElo1 = elo(Player1.eloRating, eloExp1, winLoss, k);
+	int newElo2 = elo(Player2.eloRating, eloExp2, !winLoss, k);
 
-	cout << "Daniel elo rating = " << Daniel.eloRating << endl;
-	cout << "Simon elo rating = " << Simon.eloRating << endl;
+	cout << Player1.name <<" elo rating = " << Player1.eloRating << endl;
+	cout << Player2.name <<" elo rating = " << Player2.eloRating << endl;
 	cout << "Exepected score 1: " << eloExp1 << " Expected score 2: " << eloExp2 << endl;
 
 	if (winLoss == 1)
 	{
-		cout << Daniel.name << " won " << newElo1 - Daniel.eloRating << " points" << endl;
-		cout << Simon.name << " lost " << Simon.eloRating - newElo2 << " points" << endl;
-		cout << Daniel.name << " won, so new elo rating = " << newElo1 << endl;
-		cout << Simon.name << " lost, so new elo rating = " << newElo2 << endl;
-		
+		cout << Player1.name << " won " << newElo1 - Player1.eloRating << " points" << endl;
+		cout << Player2.name << " lost " << Player2.eloRating - newElo2 << " points" << endl;
+		cout << Player1.name << " won, so new elo rating = " << newElo1 << endl;
+		cout << Player2.name << " lost, so new elo rating = " << newElo2 << endl;
+
 	}
 	else
 	{
-		cout << Daniel.name << " lost " << Daniel.eloRating - newElo1 << " points" << endl;
-		cout << Simon.name << " won " << newElo2 - Simon.eloRating << " points" << endl;
-		cout << Daniel.name << " lost, so new elo rating = " << newElo1 << endl;
-		cout << Simon.name << " won, so new elo rating = " << newElo2 << endl;
-		
+		cout << Player1.name << " lost " << Player1.eloRating - newElo1 << " points" << endl;
+		cout << Player2.name << " won " << newElo2 - Player2.eloRating << " points" << endl;
+		cout << Player1.name << " lost, so new elo rating = " << newElo1 << endl;
+		cout << Player2.name << " won, so new elo rating = " << newElo2 << endl;
+
 	}
 	
 	system("pause");
 	return 0;
 }
 
-//snake with code
-//Wie lange bist du schon in coventry?
-//Was ist dein Spezialgebeit
