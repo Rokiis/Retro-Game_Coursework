@@ -25,32 +25,41 @@ int main()
 	player2 = 1400;
 	float eloExp1, eloExp2, eloGap1, eloGap2;
 	int winLoss = rand() % 2;
+	int winTrack1, winTrack2;
+	winTrack1 = winTrack2 = 0;
 
 	for (int i = 0; i < 10; i++)
 	{
-		winLoss = rand() % 2;
+		
+		winLoss = rand() % 1;
 		eloExp1 = eloExpected(player1, player2);
 		eloExp2 = eloExpected(player2, player1);
 		player1 = elo(player1, eloExp1, winLoss, kFactor);
 		player2 = elo(player2, eloExp2, !winLoss, kFactor);
 		if (winLoss == 1)
 		{
+			cout << winLoss << endl;
 			cout << "Win for player1" << endl;
 			cout << "Player1: " << player1 << endl;
 			cout << "Player2: " << player2 << endl;
 			cout << endl;
+			winTrack1 += 1;
 		}
 		else
 		{
+			cout << winLoss << endl;
 			cout << "Win for player2" << endl;
 			cout << "Player1: " << player1 << endl;
 			cout << "Player2: " << player2 << endl;
 			cout << endl;
+			winTrack2 += 1;
 		}
 	}
 	cout << "final results" << endl;
 	cout << "Player1 elo: " << player1 << endl;
+	cout << "Player1 wins: " << winTrack1 << endl;
 	cout << "Player2 elo: " << player2 << endl;
+	cout << "Player2 wins: " << winTrack2 << endl;
 
 	system("pause");
 	return 0;
