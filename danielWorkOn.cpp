@@ -14,13 +14,6 @@ float elo(float old, float exp, float score, float k)
 	float mainScore = old + k * (score - exp);
 	return mainScore;
 }
-class Player
-{
-public:
-	string name;
-	float eloRating;
-};
-
 
 int main()
 {
