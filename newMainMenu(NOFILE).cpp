@@ -288,13 +288,26 @@ int main()
 										{
 											if (m == 0)
 											{
-												wattron(inboxMenu, COLOR_PAIR(2));
-												mvwprintw(inboxMenu, (5 * m + 3) + 1, 3, "Sender: %s", possibleSender[randomSender1].c_str());
-												mvwprintw(inboxMenu, (5 * m + 3) + 2, 3, "Subject: %s", possibleSubject[randomSubject1].c_str());
-												wattroff(inboxMenu, COLOR_PAIR(2));
-												wattron(inboxMenu, COLOR_PAIR(5));
-												mvwprintw(inboxMenu, (5 * m + 3) + 3, 3, "Reward: %d", email1Money);
-												wattroff(inboxMenu, COLOR_PAIR(5));
+												if (possibleSender[randomSender1] == possibleSender[2])
+												{
+													wattron(inboxMenu, COLOR_PAIR(69));
+													mvwprintw(inboxMenu, (5 * m + 3) + 1, 3, "Sender: %s", possibleSender[randomSender1].c_str());
+													mvwprintw(inboxMenu, (5 * m + 3) + 2, 3, "Subject: %s", possibleSubject[randomSubject1].c_str());
+													wattroff(inboxMenu, COLOR_PAIR(69));
+													wattron(inboxMenu, COLOR_PAIR(5));
+													mvwprintw(inboxMenu, (5 * m + 3) + 3, 3, "Reward: %d", email1Money);
+													wattroff(inboxMenu, COLOR_PAIR(5));
+												}
+												else
+												{
+													wattron(inboxMenu, COLOR_PAIR(2));
+													mvwprintw(inboxMenu, (5 * m + 3) + 1, 3, "Sender: %s", possibleSender[randomSender1].c_str());
+													mvwprintw(inboxMenu, (5 * m + 3) + 2, 3, "Subject: %s", possibleSubject[randomSubject1].c_str());
+													wattroff(inboxMenu, COLOR_PAIR(2));
+													wattron(inboxMenu, COLOR_PAIR(5));
+													mvwprintw(inboxMenu, (5 * m + 3) + 3, 3, "Reward: %d", email1Money);
+													wattroff(inboxMenu, COLOR_PAIR(5));
+												}
 											}
 											if (m == 1)
 											{
