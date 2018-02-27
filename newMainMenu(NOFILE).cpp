@@ -241,8 +241,12 @@ int main()
 							bool inboxLoop = false;
 							while (!inboxLoop)
 							{
-								vector<string> possibleSender = { "Daniel", "Nick", "Hazar", "Rokkas", "Patryk", "Laur", "Dr Billings", "Dr Grawemeyer", "Hannah <3", "Bob", "Jim", "Simeon", "Marianne", "Fritzli", "Phyllis", "Ursulla", "Mike", "René", "Tyquoterius", "Andris", "Chez", "Svaraaj", "Saeed", "Yasser"};
-								vector<string> possibleSubject = { "Hacking my GF's Facebook account", "Breaking into the pentagon", "Making my grades at school higher", "Leaking the contents of a database", "Hacking into and changing the balance of my bank account", "SQL Injection on vulnernable website", "Denial of Service attack on my school network" };
+								vector<string> possibleSender = { "Daniel", "Nick", "Hazar", "Rokkas", "Patryk", "Laur", "Dr Billings", "Dr Grawemeyer",
+																  "Hannah", "Bob", "Jim", "Simeon", "Marianne", "Fritzli", "Phyllis", "Ursulla",
+																  "Mike", "René", "Tyquoterius", "Andris", "Chez", "Svaraaj", "Saeed", "Yasser" };
+								vector<string> possibleSubject = { "Hacking my GF's Facebook account", "Breaking into the pentagon", "Making my grades at school higher",
+																   "Leaking the contents of a database", "Hacking into and changing the balance of my bank account", "SQL Injection on vulnernable website",
+																   "Denial of Service attack on my school network" };
 								int randomSender1, randomSender2, randomSender3;
 								int randomSubject1, randomSubject2, randomSubject3;
 								randomSender1 = rand() % possibleSender.size();
@@ -251,7 +255,7 @@ int main()
 								randomSubject1 = rand() % possibleSubject.size();
 								randomSubject2 = rand() % possibleSubject.size();
 								randomSubject3 = rand() % possibleSubject.size();
-						
+
 
 								wrefresh(secondScreenWin);
 								WINDOW * inboxMenu = newwin(20, 70, 1, 1);
@@ -262,9 +266,9 @@ int main()
 								getmaxyx(inboxMenu, inboxMaxY, inboxMaxX);
 								printMiddle(inboxMenu, inboxMaxY, inboxMaxX, 9, "INBOX");
 								wattroff(inboxMenu, COLOR_PAIR(1));
-								
+
 								keypad(inboxMenu, true);
-								string inboxChoices[4] = { "EMAIL 1", "EMAIL 2", "EMAIL 3", "GO BACK"};
+								string inboxChoices[4] = { "EMAIL 1", "EMAIL 2", "EMAIL 3", "GO BACK" };
 								int inboxChoice;
 								int inboxHighlight = 0;
 								while (1)
@@ -276,14 +280,14 @@ int main()
 											wattron(inboxMenu, A_REVERSE);
 
 										mvwprintw(inboxMenu, 5 * m + 3, 3, inboxChoices[m].c_str());
-										
+
 										wattroff(inboxMenu, A_REVERSE);
 										wattroff(inboxMenu, COLOR_PAIR(69));
-										
+
 										for (int n = 0; n < 3; n++)
 										{
 											if (m == 0)
-											{ 
+											{
 												wattron(inboxMenu, COLOR_PAIR(2));
 												mvwprintw(inboxMenu, (5 * m + 3) + 1, 3, "Sender: %s", possibleSender[randomSender1].c_str());
 												mvwprintw(inboxMenu, (5 * m + 3) + 2, 3, "Subject: %s", possibleSubject[randomSubject1].c_str());
@@ -308,15 +312,15 @@ int main()
 												mvwprintw(inboxMenu, (5 * m + 3) + 1, 3, "Sender: %s", possibleSender[randomSender3].c_str());
 												mvwprintw(inboxMenu, (5 * m + 3) + 2, 3, "Subject: %s", possibleSubject[randomSubject3].c_str());
 												wattroff(inboxMenu, COLOR_PAIR(2));
-												wattron(inboxMenu, COLOR_PAIR(5));
+												wattron(inboxMenu, COLOR_PAIR(5));	
 												mvwprintw(inboxMenu, (5 * m + 3) + 3, 3, "Reward: %d", email3Money);
 												wattroff(inboxMenu, COLOR_PAIR(5));
 											}
 
 										}
-										
+
 									}
-									
+
 									inboxChoice = wgetch(inboxMenu);
 									switch (inboxChoice)
 									{
@@ -341,7 +345,7 @@ int main()
 
 								if (inboxMenuInput == "GO BACK")
 								{
-									
+
 									inboxLoop = true;
 									refresh();
 								}
@@ -355,7 +359,7 @@ int main()
 							secondScreenLoop = true;
 							refresh();
 						}
-			
+
 						wrefresh(secondScreenWin);
 					}
 
@@ -435,9 +439,3 @@ int main()
 	return 0;
 }
 
-
-/*
-karma system
-email (inbox etc)
-first minigame
-*/
