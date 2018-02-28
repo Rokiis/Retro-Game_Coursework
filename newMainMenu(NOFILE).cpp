@@ -63,6 +63,9 @@ int main()
 		init_pair(3, COLOR_MAGENTA, 0);
 		init_pair(4, COLOR_WHITE, 0);
 		init_pair(5, COLOR_YELLOW, 0);
+		init_color(COLOR_WHITE, 255, 105, 180);
+
+
 
 		wattron(mainMenu, COLOR_PAIR(1));
 		printMiddle(mainMenu, mainMaxY, mainMaxX, 9, stux1);
@@ -288,7 +291,7 @@ int main()
 										{
 											if (m == 0)
 											{
-												if (possibleSender[randomSender1] == possibleSender[2])
+												if (possibleSender[randomSender1] == possibleSender[0] || possibleSender[randomSender1] == possibleSender[1] || possibleSender[randomSender1] == possibleSender[2] || possibleSender[randomSender1] == possibleSender[3] || possibleSender[randomSender1] == possibleSender[4] || possibleSender[randomSender1] == possibleSender[5])
 												{
 													wattron(inboxMenu, COLOR_PAIR(69));
 													mvwprintw(inboxMenu, (5 * m + 3) + 1, 3, "Sender: %s", possibleSender[randomSender1].c_str());
@@ -311,13 +314,26 @@ int main()
 											}
 											if (m == 1)
 											{
-												wattron(inboxMenu, COLOR_PAIR(2));
-												mvwprintw(inboxMenu, (5 * m + 3) + 1, 3, "Sender: %s", possibleSender[randomSender2].c_str());
-												mvwprintw(inboxMenu, (5 * m + 3) + 2, 3, "Subject: %s", possibleSubject[randomSubject2].c_str());
-												wattroff(inboxMenu, COLOR_PAIR(2));
-												wattron(inboxMenu, COLOR_PAIR(5));
-												mvwprintw(inboxMenu, (5 * m + 3) + 3, 3, "Reward: %d", email2Money);
-												wattroff(inboxMenu, COLOR_PAIR(5));
+												if (possibleSender[randomSender2] == possibleSender[6] || possibleSender[randomSender2] == possibleSender[7])
+												{
+													wattron(inboxMenu, COLOR_PAIR(3));
+													mvwprintw(inboxMenu, (5 * m + 3) + 1, 3, "Sender: %s", possibleSender[randomSender2].c_str());
+													mvwprintw(inboxMenu, (5 * m + 3) + 2, 3, "Subject: %s", possibleSubject[randomSubject2].c_str());
+													wattroff(inboxMenu, COLOR_PAIR(3));
+													wattron(inboxMenu, COLOR_PAIR(5));
+													mvwprintw(inboxMenu, (5 * m + 3) + 3, 3, "Reward: %d", email1Money);
+													wattroff(inboxMenu, COLOR_PAIR(5));
+												}
+												else
+												{ 
+													wattron(inboxMenu, COLOR_PAIR(2));
+													mvwprintw(inboxMenu, (5 * m + 3) + 1, 3, "Sender: %s", possibleSender[randomSender2].c_str());
+													mvwprintw(inboxMenu, (5 * m + 3) + 2, 3, "Subject: %s", possibleSubject[randomSubject2].c_str());
+													wattroff(inboxMenu, COLOR_PAIR(2));
+													wattron(inboxMenu, COLOR_PAIR(5));
+													mvwprintw(inboxMenu, (5 * m + 3) + 3, 3, "Reward: %d", email2Money);
+													wattroff(inboxMenu, COLOR_PAIR(5));
+												}
 											}
 											if (m == 2)
 											{
@@ -355,6 +371,11 @@ int main()
 								}
 								string inboxMenuInput = inboxChoices[inboxHighlight];
 								wrefresh(inboxMenu);
+								if (inboxMenuInput == "EMAIL 2")
+								{
+									inboxLoop = true;
+									refresh();
+								}
 
 								if (inboxMenuInput == "GO BACK")
 								{
@@ -406,12 +427,20 @@ int main()
 				printMiddle(howToPlay, instructionMaxY, instructionMaxX, 9, "INSTRUCTIONS");
 				int howToMaxY, howToMaxX;
 				getmaxyx(howToPlay, howToMaxY, howToMaxX);
-				string test = "instructions go here";
+				string test = "WELCOME TO STUXNET";
+				string test1 = "TO BEGIN THE GAME, SELECT THE 'PLAY' OPTION -";
+				string test2 = "AND ENTER YOUR DESIRED ALIAS.";												//work on
+				string test3 = "THE GAME WILL PRESENT YOU WITH A SERIES OF CHALLENGES";
+				string test4 = "COMPLETE THEM AND YOU WILL PROGRESS ON YOUR PATH TO BECOMING A HACKER";
 				/*int x = test.length();
 				mvwprintw(howToPlay, howToMaxY/2, (howToMaxX-x)/2, test.c_str());*/   // <- alternative way if my function fails
-				printMiddle(howToPlay, howToMaxY, howToMaxX, 1, test);
-				printMiddle(howToPlay, howToMaxY, howToMaxX, 2, test);
-				printMiddle(howToPlay, howToMaxY, howToMaxX, 3, test);
+				/*printMiddle(howToPlay, howToMaxY, howToMaxX, 5, test);
+				printMiddle(howToPlay, howToMaxY, howToMaxX, 4, test1);
+				printMiddle(howToPlay, howToMaxY, howToMaxX, 3, test2);
+				printMiddle(howToPlay, howToMaxY, howToMaxX, 2, test3);
+				printMiddle(howToPlay, howToMaxY, howToMaxX, 1, test4);*/
+
+
 				wattroff(howToPlay, COLOR_PAIR(1));
 				wattron(howToPlay, COLOR_PAIR(2));
 				keypad(howToPlay, true);
@@ -451,4 +480,3 @@ int main()
 
 	return 0;
 }
-
