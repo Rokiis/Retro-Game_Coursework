@@ -9,7 +9,21 @@
 #include <vector>
 using namespace std;
 bool mainMenuLoop = false;
-void printMiddle(WINDOW * win, int y, int x, int upDown, string asd) //function I created to print text within a window at the centre. aesthetics n shit. 
+class mainGamePlayer
+{
+	public:
+		string name;
+		int strikes;
+		int cash;
+};
+class danielGamePlayer
+{
+	public:
+		int skillPower;
+		int health;
+
+};
+void printMiddle(WINDOW * win, int y, int x, int upDown, string asd) //function I created to print text within a window at the centre.
 {
 	int getLength = asd.length();									 //int upDown is buggy. 9 = top of screen, play around with it. 
 	int newY = (y / 2) - upDown;
@@ -22,10 +36,7 @@ int main()
 
 	while (!mainMenuLoop)
 	{
-		int email1Money, email2Money, email3Money;
-		email1Money = 100;
-		email2Money = email1Money * 2;
-		email3Money = email2Money * 2;
+		mainGamePlayer mainPlayer;
 		initscr();
 		curs_set(0);
 		noecho(); //turns off showing what key the user pressed
@@ -54,8 +65,8 @@ int main()
 		string stux3 = " SSS    TT   U   U   X    N N N EEE    TT  ";					//won't work on codio, works on win10 vis 2017 with pdcurses
 		string stux4 = "    S   TT   U   U  X X   N  NN E      TT  ";
 		string stux5 = "SSSS    TT    UUU  X   X  N   N EEEE   TT  ";
-		int mainMaxY, mainMaxX;
-		getmaxyx(mainMenu, mainMaxY, mainMaxX);
+		int instructionMaxY, instructionMaxX;
+		getmaxyx(mainMenu, instructionMaxY, instructionMaxX);
 
 		init_pair(1, COLOR_GREEN, 0);
 		init_pair(69, COLOR_RED, 0);	//colour initialisations
@@ -63,16 +74,16 @@ int main()
 		init_pair(3, COLOR_MAGENTA, 0);
 		init_pair(4, COLOR_WHITE, 0);
 		init_pair(5, COLOR_YELLOW, 0);
-		init_color(COLOR_WHITE, 255, 105, 180);
+		init_pair(6, COLOR_WHITE, 4);
 
 
 
 		wattron(mainMenu, COLOR_PAIR(1));
-		printMiddle(mainMenu, mainMaxY, mainMaxX, 9, stux1);
-		printMiddle(mainMenu, mainMaxY, mainMaxX, 8, stux2);
-		printMiddle(mainMenu, mainMaxY, mainMaxX, 7, stux3);
-		printMiddle(mainMenu, mainMaxY, mainMaxX, 6, stux4);
-		printMiddle(mainMenu, mainMaxY, mainMaxX, 5, stux5);
+		printMiddle(mainMenu, instructionMaxY, instructionMaxX, 9, stux1);
+		printMiddle(mainMenu, instructionMaxY, instructionMaxX, 8, stux2);
+		printMiddle(mainMenu, instructionMaxY, instructionMaxX, 7, stux3);
+		printMiddle(mainMenu, instructionMaxY, instructionMaxX, 6, stux4);
+		printMiddle(mainMenu, instructionMaxY, instructionMaxX, 5, stux5);
 		wattroff(mainMenu, COLOR_PAIR(1));
 
 		wattron(mainMenu, COLOR_PAIR(69));
@@ -167,17 +178,16 @@ int main()
 				if (inputCharacterCreation == "ENTER YOUR NAME")
 				{
 					echo();
-					curs_set(1);
-					string playerSessionName;
+					curs_set(1);																			
 					wrefresh(inboxMenu);
-					mvwscanw(inboxMenu, 14, 2, "%s", playerSessionName.c_str());
+					mvwscanw(inboxMenu, 14, 2, "%s", mainPlayer.name.c_str());
 					wrefresh(inboxMenu);
 					noecho();
 					curs_set(0);
-					mvwprintw(inboxMenu, 14, 2, "WELCOME, %s. Press any key to continue...", playerSessionName.c_str());
-
-					int playerSessionCash = 0;
-					string playerSessionStrikes = " ";				//important values
+					mvwprintw(inboxMenu, 14, 2, "WELCOME, %s. Press any key to continue...", mainPlayer.name.c_str());
+					mainPlayer.cash = 0;
+					mainPlayer.strikes = 0;
+					string playerSessionStrikes = " ";									//important value
 
 					wrefresh(inboxMenu);
 					getch();
@@ -195,10 +205,10 @@ int main()
 						wattroff(secondScreenWin, COLOR_PAIR(1));
 
 						wattron(secondScreenWin, COLOR_PAIR(4));
-						mvwprintw(secondScreenWin, 1, 2, "NAME: %s", playerSessionName.c_str());
+						mvwprintw(secondScreenWin, 1, 2, "NAME: %s", mainPlayer.name.c_str());
 						wattroff(secondScreenWin, COLOR_PAIR(4));
 						wattron(secondScreenWin, COLOR_PAIR(5));
-						mvwprintw(secondScreenWin, 1, 55, "CASH: %d", playerSessionCash);
+						mvwprintw(secondScreenWin, 1, 55, "CASH: %d", mainPlayer.cash);
 						wattroff(secondScreenWin, COLOR_PAIR(5));
 						wattron(secondScreenWin, COLOR_PAIR(69));
 						mvwprintw(secondScreenWin, 3, 31, "STRIKES: %s", playerSessionStrikes.c_str());
@@ -244,12 +254,16 @@ int main()
 							bool inboxLoop = false;
 							while (!inboxLoop)
 							{
+								int email1Money, email2Money, email3Money;
+								email1Money = 100;
+								email2Money = email1Money * 2;
+								email3Money = email2Money * 2;
 								vector<string> possibleSender = { "Daniel", "Nick", "Hazar", "Rokkas", "Patryk", "Laur", "Dr Billings", "Dr Grawemeyer",
-																  "Hannah", "Bob", "Jim", "Simeon", "Marianne", "Fritzli", "Phyllis", "Ursulla",
-																  "Mike", "René", "Tyquoterius", "Andris", "Chez", "Svaraaj", "Saeed", "Yasser" };
-								vector<string> possibleSubject = { "Hacking my GF's Facebook account", "Breaking into the pentagon", "Making my grades at school higher",
-																   "Leaking the contents of a database", "Hacking into and changing the balance of my bank account", "SQL Injection on vulnernable website",
-																   "Denial of Service attack on my school network" };
+									"Hannah", "Bob", "Jim", "Simeon", "Marianne", "Fritzli", "Phyllis", "Ursulla",
+									"Mike", "René", "Tyquoterius", "Andris", "Chez", "Svaraaj", "Saeed", "Yasser" };
+								vector<string> possibleSubject = { "hacking his/her partners Facebook account", "breaking into the pentagon", "making his/her grades at school higher",
+									"leaking the contents of a database", "'changing' the balance of his/her bank account", "performing an SQL Injection on a vulnernable website",
+									"a DDoS attack on his/her school network" };
 								int randomSender1, randomSender2, randomSender3;
 								int randomSubject1, randomSubject2, randomSubject3;
 								randomSender1 = rand() % possibleSender.size();
@@ -321,11 +335,11 @@ int main()
 													mvwprintw(inboxMenu, (5 * m + 3) + 2, 3, "Subject: %s", possibleSubject[randomSubject2].c_str());
 													wattroff(inboxMenu, COLOR_PAIR(3));
 													wattron(inboxMenu, COLOR_PAIR(5));
-													mvwprintw(inboxMenu, (5 * m + 3) + 3, 3, "Reward: %d", email1Money);
+													mvwprintw(inboxMenu, (5 * m + 3) + 3, 3, "Reward: %d", email2Money);
 													wattroff(inboxMenu, COLOR_PAIR(5));
 												}
 												else
-												{ 
+												{
 													wattron(inboxMenu, COLOR_PAIR(2));
 													mvwprintw(inboxMenu, (5 * m + 3) + 1, 3, "Sender: %s", possibleSender[randomSender2].c_str());
 													mvwprintw(inboxMenu, (5 * m + 3) + 2, 3, "Subject: %s", possibleSubject[randomSubject2].c_str());
@@ -341,7 +355,7 @@ int main()
 												mvwprintw(inboxMenu, (5 * m + 3) + 1, 3, "Sender: %s", possibleSender[randomSender3].c_str());
 												mvwprintw(inboxMenu, (5 * m + 3) + 2, 3, "Subject: %s", possibleSubject[randomSubject3].c_str());
 												wattroff(inboxMenu, COLOR_PAIR(2));
-												wattron(inboxMenu, COLOR_PAIR(5));	
+												wattron(inboxMenu, COLOR_PAIR(5));
 												mvwprintw(inboxMenu, (5 * m + 3) + 3, 3, "Reward: %d", email3Money);
 												wattroff(inboxMenu, COLOR_PAIR(5));
 											}
@@ -371,10 +385,29 @@ int main()
 								}
 								string inboxMenuInput = inboxChoices[inboxHighlight];
 								wrefresh(inboxMenu);
-								if (inboxMenuInput == "EMAIL 2")
+								if (inboxMenuInput == "EMAIL 1")
 								{
-									inboxLoop = true;
-									refresh();
+									bool danielGameLoop = false;
+									while (!danielGameLoop)
+									{
+										wrefresh(inboxMenu);
+										int danielGameMaxY, danielGameMaxX;
+										WINDOW * danielGameWin = newwin(20, 75, 1, 1);
+										getmaxyx(danielGameWin, danielGameMaxY, danielGameMaxX);
+										refresh();
+										keypad(danielGameWin, true);
+										wborder(danielGameWin, 0, 0, 0, 0, 0, 0, 0, 0);
+										mvwprintw(danielGameWin, 7, 1, "You are about to embark on a mission to help %s involving", possibleSender[randomSender1].c_str());
+										mvwprintw(danielGameWin, 8, 1, "helping him/her with %s", possibleSubject[randomSubject1].c_str());
+										wrefresh(danielGameWin);
+										getch();
+										wclear(danielGameWin);
+										mvwprintw(danielGameWin, 7, 1, "testy test test");
+										wrefresh(danielGameWin);
+										getch();
+										danielGameLoop = true;
+										refresh();
+									}
 								}
 
 								if (inboxMenuInput == "GO BACK")
@@ -424,21 +457,38 @@ int main()
 				wattron(howToPlay, COLOR_PAIR(1));
 				int instructionMaxY, instructionMaxX;
 				getmaxyx(howToPlay, instructionMaxY, instructionMaxX);
-				printMiddle(howToPlay, instructionMaxY, instructionMaxX, 9, "INSTRUCTIONS");
-				int howToMaxY, howToMaxX;
-				getmaxyx(howToPlay, howToMaxY, howToMaxX);
-				string test = "WELCOME TO STUXNET";
-				string test1 = "TO BEGIN THE GAME, SELECT THE 'PLAY' OPTION -";
-				string test2 = "AND ENTER YOUR DESIRED ALIAS.";												//work on
-				string test3 = "THE GAME WILL PRESENT YOU WITH A SERIES OF CHALLENGES";
-				string test4 = "COMPLETE THEM AND YOU WILL PROGRESS ON YOUR PATH TO BECOMING A HACKER";
+				wattron(howToPlay, COLOR_PAIR(1));
+				printMiddle(howToPlay, instructionMaxY, instructionMaxX, 9, stux1);
+				printMiddle(howToPlay, instructionMaxY, instructionMaxX, 8, stux2);
+				printMiddle(howToPlay, instructionMaxY, instructionMaxX, 7, stux3);
+				printMiddle(howToPlay, instructionMaxY, instructionMaxX, 6, stux4);
+				printMiddle(howToPlay, instructionMaxY, instructionMaxX, 5, stux5);
+				wattroff(howToPlay, COLOR_PAIR(1));
+				wattron(howToPlay, COLOR_PAIR(69));
+				printMiddle(howToPlay, instructionMaxY, instructionMaxX, 4, "INSTRUCTIONS");
+				wattroff(howToPlay, COLOR_PAIR(69));
+				string instructionString = "WELCOME TO STUXNET                                    ";
+				string instructionString1 = "TO BEGIN THE GAME, SELECT THE 'PLAY' OPTION AND       ";
+				string instructionString2 = "ENTER YOUR DESIRED ALIAS.                             ";												//work on
+				string instructionString3 = "THE GAME WILL PRESENT YOU WITH A SERIES OF CHALLENGES ";
+				string instructionString4 = "IN THE FORM OF EMAILS FROM PAYING CUSTOMERS.          ";
+				string instructionString5 = "COMPLETE THEM AND YOU WILL PROGRESS ON YOUR PATH TO - ";
+				string instructionString6 = "BECOMING A FORMIDDABLE HACKER.                        ";
+				wattron(howToPlay, COLOR_PAIR(6));
+				mvwprintw(howToPlay, 7, 7, instructionString.c_str());
+				mvwprintw(howToPlay, 8, 7, instructionString1.c_str());
+				mvwprintw(howToPlay, 9, 7, instructionString2.c_str());
+				mvwprintw(howToPlay, 10, 7, instructionString3.c_str());
+				mvwprintw(howToPlay, 11, 7, instructionString4.c_str());
+				mvwprintw(howToPlay, 12, 7, instructionString5.c_str());
+				mvwprintw(howToPlay, 13, 7, instructionString6.c_str());
+
+				wattroff(howToPlay, COLOR_PAIR(6));
+
+
 				/*int x = test.length();
 				mvwprintw(howToPlay, howToMaxY/2, (howToMaxX-x)/2, test.c_str());*/   // <- alternative way if my function fails
-				/*printMiddle(howToPlay, howToMaxY, howToMaxX, 5, test);
-				printMiddle(howToPlay, howToMaxY, howToMaxX, 4, test1);
-				printMiddle(howToPlay, howToMaxY, howToMaxX, 3, test2);
-				printMiddle(howToPlay, howToMaxY, howToMaxX, 2, test3);
-				printMiddle(howToPlay, howToMaxY, howToMaxX, 1, test4);*/
+				
 
 
 				wattroff(howToPlay, COLOR_PAIR(1));
@@ -453,7 +503,7 @@ int main()
 					{
 						if (m == howToPlayHighlight)
 							wattron(howToPlay, A_REVERSE);
-						mvwprintw(howToPlay, m + 7, 2, howToPlayChoices[m].c_str());
+						mvwprintw(howToPlay, m + 17, 2, howToPlayChoices[m].c_str());
 						wattroff(howToPlay, A_REVERSE);
 					}
 					howToPlayChoice = wgetch(howToPlay);
