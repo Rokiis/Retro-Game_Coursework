@@ -25,8 +25,8 @@ typedef struct Room
 	int width;
 
 	Position ** doors; //door generation, 4 possible doors on buildings
-	//Enemy ** enemies;
-	//Item ** items;
+					   //Enemy ** enemies;
+					   //Item ** items;
 }Room;
 
 typedef struct DanielPlayer
@@ -52,29 +52,29 @@ void handlePlayerInput(WINDOW * win, int input, DanielPlayer * DanielGamePlayer)
 	int newX;
 	switch (input)
 	{
-	//move up
+		//move up
 	case 'w':
 	case 'W':
 		newY = DanielGamePlayer->position.y - 1;
 		newX = DanielGamePlayer->position.x;
 		break;
-	//move down
+		//move down
 	case 's':
 	case 'S':
 		newY = DanielGamePlayer->position.y + 1;
 		newX = DanielGamePlayer->position.x;
 		break;
-	//move left
+		//move left
 	case 'a':
 	case 'A':
 		newY = DanielGamePlayer->position.y;
-		newX = DanielGamePlayer->position.x -1;
+		newX = DanielGamePlayer->position.x - 1;
 		break;
-	//move right
+		//move right
 	case 'd':
 	case 'D':
 		newY = DanielGamePlayer->position.y;
-		newX = DanielGamePlayer->position.x +1;
+		newX = DanielGamePlayer->position.x + 1;
 		break;
 	default:
 		break;
@@ -86,8 +86,8 @@ void handlePlayerInput(WINDOW * win, int input, DanielPlayer * DanielGamePlayer)
 Room ** mapSetup(WINDOW * window)
 {
 	Room ** rooms;
-	rooms = (Room **)malloc(sizeof(Room)*6);			
-	
+	rooms = (Room **)malloc(sizeof(Room) * 6);
+
 	rooms[0] = createRoom(10, 40, 7, 11);
 	drawRoom(window, rooms[0]);
 
@@ -108,7 +108,7 @@ Room * createRoom(int y, int x, int height, int width)
 	newRoom->height = height;
 	newRoom->width = width;
 
-	
+
 	newRoom->doors = (Position **)malloc(sizeof(Position) * 4);
 
 	newRoom->doors[0] = (Position *)malloc(sizeof(Position));
@@ -120,12 +120,12 @@ Room * createRoom(int y, int x, int height, int width)
 	newRoom->doors[1]->y = newRoom->position.y + newRoom->height;										//bottom door
 
 	newRoom->doors[2] = (Position *)malloc(sizeof(Position));
-	newRoom->doors[2]->x = rand() % (height - 2) + newRoom->position.y + 1;										//left door
-	newRoom->doors[2]->y = newRoom->position.x;							
+	newRoom->doors[2]->y = rand() % (height - 2) + newRoom->position.y + 1;										//left door
+	newRoom->doors[2]->x = newRoom->position.x;
 
 	newRoom->doors[3] = (Position *)malloc(sizeof(Position));
-	newRoom->doors[3]->x = rand() % (height - 2)+ newRoom->position.y + 1;										//right door
-	newRoom->doors[3]->y = newRoom->position.x + width -1;
+	newRoom->doors[3]->y = rand() % (height - 2) + newRoom->position.y + 1;										//right door
+	newRoom->doors[3]->x = newRoom->position.x + width - 1;
 
 	return newRoom;
 }
@@ -147,7 +147,7 @@ void drawRoom(WINDOW * win, Room * room)
 		wattron(win, COLOR_PAIR(1));
 		//side
 		mvwprintw(win, y, room->position.x, "|");
-		mvwprintw(win, y, room->position.x + room->width -1, "|");
+		mvwprintw(win, y, room->position.x + room->width - 1, "|");
 		//floor
 		wattroff(win, COLOR_PAIR(1));
 		for (x = room->position.x + 1; x < room->position.x + room->width - 1; x++)
@@ -159,8 +159,8 @@ void drawRoom(WINDOW * win, Room * room)
 	wattron(win, COLOR_PAIR(69));
 	mvwprintw(win, room->doors[0]->y, room->doors[0]->x, "+");
 	mvwprintw(win, room->doors[1]->y, room->doors[1]->x, "+");
-	//mvwprintw(win, room->doors[2]->y, room->doors[2]->x, "+");
-	//mvwprintw(win, room->doors[3]->y, room->doors[3]->x, "+");
+	mvwprintw(win, room->doors[2]->y, room->doors[2]->x, "+");
+	mvwprintw(win, room->doors[3]->y, room->doors[3]->x, "+");
 	wattroff(win, COLOR_PAIR(69));
 
 }
@@ -169,13 +169,13 @@ void checkPosition(WINDOW * win, int newY, int newX, DanielPlayer * DanielGamePl
 	int space;
 	switch (mvwinch(win, newY, newX))		//checks character collision
 	{
-		case '.':
-			playerMove(win, newY, newX, DanielGamePlayer);			//when next position is a '.', we can move
-			break;
-	
-		default:
-			move(DanielGamePlayer->position.y, DanielGamePlayer->position.x);
-			break;
+	case '.':
+		playerMove(win, newY, newX, DanielGamePlayer);			//when next position is a '.', we can move
+		break;
+
+	default:
+		move(DanielGamePlayer->position.y, DanielGamePlayer->position.x);
+		break;
 	}
 
 }
@@ -203,10 +203,10 @@ DanielPlayer * playerSetup(WINDOW * win)
 }
 class MainGamePlayer
 {
-	public:
-		string name;
-		int strikes;			//used for main menu stats only
-		int cash;
+public:
+	string name;
+	int strikes;			//used for main menu stats only
+	int cash;
 };
 void printMiddle(WINDOW * win, int y, int x, int upDown, string asd) //function I created to print text within a window at the centre.
 {
@@ -372,7 +372,7 @@ int main()
 				if (inputCharacterCreation == "ENTER YOUR NAME")
 				{
 					echo();
-					curs_set(1);																			
+					curs_set(1);
 					wrefresh(inboxMenu);
 					mvwscanw(inboxMenu, 14, 2, "%s", mainPlayer.name.c_str());
 					wrefresh(inboxMenu);
@@ -632,11 +632,11 @@ int main()
 										wrefresh(danielGameWin);									//note: DanielGamePlayer is object of class DanielPlayer
 										while ((danielGameInput = getch()) != 'x')
 										{
-											
+
 											handlePlayerInput(danielGameWin, danielGameInput, DanielGamePlayer);
 											wrefresh(danielGameWin);
 										}
-										
+
 										endwin();
 										danielGameLoop = true;
 										refresh();
@@ -721,7 +721,7 @@ int main()
 
 				/*int x = test.length();
 				mvwprintw(howToPlay, howToMaxY/2, (howToMaxX-x)/2, test.c_str());*/   // <- alternative way if my function fails
-				
+
 
 
 				wattroff(howToPlay, COLOR_PAIR(1));
