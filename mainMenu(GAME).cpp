@@ -8,8 +8,11 @@
 #include <time.h>
 #include <vector>
 #include <stdlib.h>
+
+
 using namespace std;
 bool mainMenuLoop = false;
+
 
 typedef struct Position
 {
@@ -17,7 +20,6 @@ typedef struct Position
 	int y;
 
 } Position;
-
 typedef struct Room
 {
 	Position position;
@@ -28,49 +30,53 @@ typedef struct Room
 					   //Enemy ** enemies;
 					   //Item ** items;
 }Room;
-
 typedef struct DanielPlayer
 {
 	Position position;
 	int health;
 	int eloRating;
-
 } DanielPlayer;
 
 Room ** mapSetup(WINDOW * window);
 DanielPlayer * playerSetup(WINDOW * win);
 void handlePlayerInput(WINDOW * win, int input, DanielPlayer * DanielGamePlayer);
-void checkPosition(WINDOW * win, int newY, int newX, DanielPlayer * DanielGamePlayer);
-void playerMove(WINDOW * win, int y, int x, DanielPlayer * DanielGamePlayer);		//player
+void checkPosition(WINDOW * win, int newY, int newX, DanielPlayer * DanielGamePlayer);			//player
+void playerMove(WINDOW * win, int y, int x, DanielPlayer * DanielGamePlayer);		
 
-Room * createRoom(int y, int x, int height, int width);		//room
-void drawRoom(WINDOW * win, Room * room);
+Room * createRoom(int y, int x, int height, int width);		
+void drawRoom(WINDOW * win, Room * room);													   //room
+int doorPath(WINDOW * win, Position * doorOne, Position * doorTwo);
 
 void handlePlayerInput(WINDOW * win, int input, DanielPlayer * DanielGamePlayer)
 {
-	int newY;
-	int newX;
+	
+	int newY = 0;		//fixes bug, if bug appears take a look again
+	int newX = 0;
 	switch (input)
 	{
 		//move up
+	case KEY_UP:
 	case 'w':
 	case 'W':
 		newY = DanielGamePlayer->position.y - 1;
 		newX = DanielGamePlayer->position.x;
 		break;
 		//move down
+	case KEY_DOWN:
 	case 's':
 	case 'S':
 		newY = DanielGamePlayer->position.y + 1;
 		newX = DanielGamePlayer->position.x;
 		break;
 		//move left
+	case KEY_LEFT:
 	case 'a':
 	case 'A':
 		newY = DanielGamePlayer->position.y;
 		newX = DanielGamePlayer->position.x - 1;
 		break;
 		//move right
+	case KEY_RIGHT:
 	case 'd':
 	case 'D':
 		newY = DanielGamePlayer->position.y;
@@ -90,12 +96,17 @@ Room ** mapSetup(WINDOW * window)
 
 	rooms[0] = createRoom(10, 40, 7, 11);
 	drawRoom(window, rooms[0]);
-
+	
 	rooms[1] = createRoom(5, 5, 10, 11); //up/down, left/right, height, width
 	drawRoom(window, rooms[1]);
 
 	rooms[2] = createRoom(1, 50, 3, 10);
 	drawRoom(window, rooms[2]);
+
+	doorPath(window, rooms[1]->doors[3], rooms[0]->doors[1]);		//function to connect doors of rooms
+	doorPath(window, rooms[2]->doors[2], rooms[0]->doors[0]);
+
+
 
 	return rooms;
 }
@@ -116,12 +127,12 @@ Room * createRoom(int y, int x, int height, int width)
 	newRoom->doors[0]->y = newRoom->position.y;														//top door
 
 	newRoom->doors[1] = (Position *)malloc(sizeof(Position));
-	newRoom->doors[1]->x = rand() % (width - 2) + newRoom->position.x + 1;
-	newRoom->doors[1]->y = newRoom->position.y + newRoom->height;										//bottom door
+	newRoom->doors[1]->y = rand() % (height - 2) + newRoom->position.y + 1;										//left door
+	newRoom->doors[1]->x = newRoom->position.x;
 
 	newRoom->doors[2] = (Position *)malloc(sizeof(Position));
-	newRoom->doors[2]->y = rand() % (height - 2) + newRoom->position.y + 1;										//left door
-	newRoom->doors[2]->x = newRoom->position.x;
+	newRoom->doors[2]->x = rand() % (width - 2) + newRoom->position.x + 1;
+	newRoom->doors[2]->y = newRoom->position.y + newRoom->height;										//bottom door
 
 	newRoom->doors[3] = (Position *)malloc(sizeof(Position));
 	newRoom->doors[3]->y = rand() % (height - 2) + newRoom->position.y + 1;										//right door
@@ -156,26 +167,84 @@ void drawRoom(WINDOW * win, Room * room)
 		}
 	}
 	//draw doors
-	wattron(win, COLOR_PAIR(69));
+
 	mvwprintw(win, room->doors[0]->y, room->doors[0]->x, "+");
 	mvwprintw(win, room->doors[1]->y, room->doors[1]->x, "+");
 	mvwprintw(win, room->doors[2]->y, room->doors[2]->x, "+");
 	mvwprintw(win, room->doors[3]->y, room->doors[3]->x, "+");
-	wattroff(win, COLOR_PAIR(69));
+	
 
+}
+int doorPath(WINDOW * win, Position * doorOne, Position * doorTwo)
+{
+	Position temp;
+	Position previous;
+	temp.x = doorOne->x;
+	temp.y = doorOne->y;
+
+	previous = temp;
+
+	int count = 0;
+
+	while (1)
+	{
+		//check left 
+		if ((abs((temp.x - 1) - doorTwo->x) < abs(temp.x - doorTwo->x)) && (mvwinch(win, temp.y, temp.x - 1) == ' '))
+		{
+			previous.x = temp.x;
+			temp.x = temp.x - 1;
+		}
+		//checks right
+		else if ((abs((temp.x + 1) - doorTwo->x) < abs(temp.x - doorTwo->x)) && (mvwinch(win, temp.y, temp.x + 1) == ' '))
+		{
+			//mvwprintw(win, temp.y, temp.x + 1, "#");
+			previous.x = temp.x;
+			temp.x = temp.x + 1;
+		}																																	//path finding algorithm
+		//checks down
+		else if ((abs((temp.y + 1) - doorTwo->y) < abs(temp.y - doorTwo->y)) && (mvwinch(win, temp.y + 1, temp.x) == ' '))
+		{
+			previous.y = temp.y;
+			temp.y = temp.y + 1;
+		}
+		//checks up
+		else if ((abs((temp.y - 1) - doorTwo->y) < abs(temp.y - doorTwo->y)) && (mvwinch(win, temp.y - 1, temp.x) == ' '))
+		{
+			previous.y = temp.y;
+			temp.y = temp.y - 1;
+		}
+		else
+		{
+			if (count == 0)
+			{
+				temp = previous;
+				count++;
+				continue;
+			}
+			else 
+			{
+				return 0;
+			}
+		}
+		mvwprintw(win, temp.y, temp.x, "#");
+		
+	}
+
+	return 1;
 }
 void checkPosition(WINDOW * win, int newY, int newX, DanielPlayer * DanielGamePlayer)
 {
 	int space;
 	switch (mvwinch(win, newY, newX))		//checks character collision
 	{
-	case '.':
-		playerMove(win, newY, newX, DanielGamePlayer);			//when next position is a '.', we can move
-		break;
-
-	default:
-		move(DanielGamePlayer->position.y, DanielGamePlayer->position.x);
-		break;
+		case '.':
+		case '#':
+		case '+':
+			playerMove(win, newY, newX, DanielGamePlayer);			//when next position is a '.', we can move
+			break;
+		default:
+			move(DanielGamePlayer->position.y, DanielGamePlayer->position.x);
+			break;
 	}
 
 }
@@ -201,6 +270,9 @@ DanielPlayer * playerSetup(WINDOW * win)
 	playerMove(win, 10, 13, newPlayer);
 	return newPlayer;
 }
+//functions below are for the main menu. above are for daniel's game. 
+
+
 class MainGamePlayer
 {
 public:
@@ -215,7 +287,6 @@ void printMiddle(WINDOW * win, int y, int x, int upDown, string asd) //function 
 	int newX = (x - getLength) / 2;
 	mvwprintw(win, newY, newX, asd.c_str());
 }
-
 
 
 
@@ -622,17 +693,22 @@ int main()
 										wrefresh(danielGameWin);
 										getch();
 										wclear(danielGameWin);
+																									//daniel game stuff
 
+
+										char ** level;
 										int danielGameInput;
 										mapSetup(danielGameWin);
 										DanielGamePlayer = playerSetup(danielGameWin);				//main game initiations
 										int mainEloRating = DanielGamePlayer->eloRating;
 										mainEloRating = 1400;
+										keypad(danielGameWin, true);
 										mvwprintw(danielGameWin, 1, 1, "Elo rating: %d", mainEloRating);
+										
 										wrefresh(danielGameWin);									//note: DanielGamePlayer is object of class DanielPlayer
 										while ((danielGameInput = getch()) != 'x')
 										{
-
+											
 											handlePlayerInput(danielGameWin, danielGameInput, DanielGamePlayer);
 											wrefresh(danielGameWin);
 										}
