@@ -13,7 +13,6 @@
 using namespace std;
 bool mainMenuLoop = false;
 
-
 typedef struct Position
 {
 	int x;
@@ -97,18 +96,34 @@ Room ** mapSetup(WINDOW * window)
 	Room ** rooms;
 	rooms = (Room **)malloc(sizeof(Room) * 6);
 
+	vector<int> heightPicker = { 4, 5, 6, 7, 8};
+	vector<int> widthPicker = { 7, 8, 9, 10, 11, 12 };
+	
+
+	/*
+	int rPicker1 = rand() % heightPicker.size();
+	int rPicker2 = rand() % widthPicker.size();
+	int rPicker3 = rand() % heightPicker.size();
+	int rPicker4 = rand() % widthPicker.size();
+													//work on
+	int rHeight1 = heightPicker[rPicker1];
+	int rWidth1 = widthPicker[rPicker2];
+	int rHeight2 = heightPicker[rPicker3];
+	int rWidth2 = widthPicker[rPicker4];
+	*/
+	
 	rooms[0] = createRoom(10, 40, 7, 11);
 	drawRoom(window, rooms[0]);
 
-	rooms[1] = createRoom(5, 5, 10, 11); //up/down, left/right, height, width
+	rooms[1] = createRoom(9, 5, 6, 11); //up/down, left/right, height, width
 	drawRoom(window, rooms[1]);
 
 	rooms[2] = createRoom(1, 50, 3, 10);
 	drawRoom(window, rooms[2]);
 
-	doorPath(window, rooms[1]->doors[3], rooms[0]->doors[1]);		//function to connect doors of rooms
+	doorPath(window, rooms[1]->doors[3], rooms[0]->doors[1]);			//0=top,1=left,2=bottom,3=right
 	doorPath(window, rooms[2]->doors[2], rooms[0]->doors[0]);
-
+	doorPath(window, rooms[2]->doors[1], rooms[1]->doors[0]);
 
 
 	return rooms;
@@ -169,7 +184,7 @@ void drawRoom(WINDOW * win, Room * room)
 	wattron(win, COLOR_PAIR(1));
 	for (x = room->position.x; x < room->position.x + room->width; x++)
 	{
-		mvwprintw(win, room->position.y, x, "#"); //top
+		mvwprintw(win, room->position.y, x, "="); //top
 		mvwprintw(win, room->position.y + room->height, x, "="); //bottom
 	}
 	wattroff(win, COLOR_PAIR(1));
@@ -290,13 +305,13 @@ DanielPlayer * playerSetup(WINDOW * win)
 	DanielPlayer * newPlayer;
 	newPlayer = (DanielPlayer *)malloc(sizeof(DanielPlayer));
 
-	newPlayer->position.y = 10;			//starting positions
-	newPlayer->position.x = 13;
+	newPlayer->position.y = 12;			//starting positions
+	newPlayer->position.x = 10;    //increase = further right, decrease further left
 	newPlayer->health = 10;
-
+	wattron(win, COLOR_PAIR(5));
 	mvwprintw(win, newPlayer->position.y, newPlayer->position.x, "@");
 	move(newPlayer->position.y, newPlayer->position.x);
-
+	wattroff(win, COLOR_PAIR(5));
 	return newPlayer;
 }
 //functions below are for the main menu. above are for daniel's game. 
