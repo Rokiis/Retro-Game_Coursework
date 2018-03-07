@@ -37,56 +37,59 @@ typedef struct DanielPlayer
 	int eloRating;
 } DanielPlayer;
 
+//map
 Room ** mapSetup(WINDOW * window);
-DanielPlayer * playerSetup(WINDOW * win);
-void handlePlayerInput(WINDOW * win, int input, DanielPlayer * DanielGamePlayer);
-void checkPosition(WINDOW * win, int newY, int newX, DanielPlayer * DanielGamePlayer);			//player
-void playerMove(WINDOW * win, int y, int x, DanielPlayer * DanielGamePlayer);		
 
+//player
+DanielPlayer * playerSetup(WINDOW * win);
+Position * handlePlayerInput(WINDOW * win, int input, DanielPlayer * DanielGamePlayer);
+void checkPosition(WINDOW * win, Position * newPosition, DanielPlayer * DanielGamePlayer, char ** level);			
+void playerMove(WINDOW * win, Position * newPosition, DanielPlayer * DanielGamePlayer, char ** level);		
+//room
 Room * createRoom(int y, int x, int height, int width);		
-void drawRoom(WINDOW * win, Room * room);													   //room
+void drawRoom(WINDOW * win, Room * room);													   
 int doorPath(WINDOW * win, Position * doorOne, Position * doorTwo);
 
-void handlePlayerInput(WINDOW * win, int input, DanielPlayer * DanielGamePlayer)
+Position * handlePlayerInput(WINDOW * win, int input, DanielPlayer * DanielGamePlayer)
 {
 	
-	int newY = 0;		//fixes bug, if bug appears take a look again
-	int newX = 0;
+	Position * newPosition;
+	newPosition = (Position *)malloc(sizeof(Position));
 	switch (input)
 	{
 		//move up
 	case KEY_UP:
 	case 'w':
 	case 'W':
-		newY = DanielGamePlayer->position.y - 1;
-		newX = DanielGamePlayer->position.x;
+		newPosition->y = DanielGamePlayer->position.y - 1;
+		newPosition->x = DanielGamePlayer->position.x;
 		break;
 		//move down
 	case KEY_DOWN:
 	case 's':
 	case 'S':
-		newY = DanielGamePlayer->position.y + 1;
-		newX = DanielGamePlayer->position.x;
+		newPosition->y = DanielGamePlayer->position.y + 1;
+		newPosition->x = DanielGamePlayer->position.x;
 		break;
 		//move left
 	case KEY_LEFT:
 	case 'a':
 	case 'A':
-		newY = DanielGamePlayer->position.y;
-		newX = DanielGamePlayer->position.x - 1;
+		newPosition->y = DanielGamePlayer->position.y;
+		newPosition->x = DanielGamePlayer->position.x - 1;
 		break;
 		//move right
 	case KEY_RIGHT:
 	case 'd':
 	case 'D':
-		newY = DanielGamePlayer->position.y;
-		newX = DanielGamePlayer->position.x + 1;
+		newPosition->y = DanielGamePlayer->position.y;
+		newPosition->x = DanielGamePlayer->position.x + 1;
 		break;
 	default:
 		break;
 	}
 
-	checkPosition(win, newY, newX, DanielGamePlayer);
+	return newPosition;
 
 }
 Room ** mapSetup(WINDOW * window)
@@ -110,6 +113,24 @@ Room ** mapSetup(WINDOW * window)
 
 	return rooms;
 }
+
+char ** saveLevelPositions(WINDOW * win)
+{
+	int x, y;
+	char ** positions;
+	positions = (char **)(malloc(sizeof(char *) * 25));
+
+	for (y = 0; y < 25; y++) 
+	{
+		positions[y] = (char *)malloc(sizeof(char) * 100);
+		for (x = 0; x < 100; x++)
+		{
+			positions[y][x] = mvwinch(win, y, x);
+		}
+	}
+	return positions;
+}
+
 Room * createRoom(int y, int x, int height, int width)
 {
 	Room * newRoom;
@@ -232,15 +253,15 @@ int doorPath(WINDOW * win, Position * doorOne, Position * doorTwo)
 
 	return 1;
 }
-void checkPosition(WINDOW * win, int newY, int newX, DanielPlayer * DanielGamePlayer)
+void checkPosition(WINDOW * win, Position * newPosition, DanielPlayer * DanielGamePlayer, char ** level)
 {
 	int space;
-	switch (mvwinch(win, newY, newX))		//checks character collision
+	switch (mvwinch(win, newPosition->y, newPosition->x))		//checks character collision
 	{
 		case '.':
 		case '#':
 		case '+':
-			playerMove(win, newY, newX, DanielGamePlayer);			//when next position is a '.', we can move
+			playerMove(win, newPosition, DanielGamePlayer, level);			//when next position is a '.', we can move
 			break;
 		default:
 			move(DanielGamePlayer->position.y, DanielGamePlayer->position.x);
@@ -248,11 +269,16 @@ void checkPosition(WINDOW * win, int newY, int newX, DanielPlayer * DanielGamePl
 	}
 
 }
-void playerMove(WINDOW * win, int y, int x, DanielPlayer * DanielGamePlayer)
+void playerMove(WINDOW * win, Position * newPosition, DanielPlayer * DanielGamePlayer, char ** level)
 {
-	mvwprintw(win, DanielGamePlayer->position.y, DanielGamePlayer->position.x, ".");
-	DanielGamePlayer->position.y = y;
-	DanielGamePlayer->position.x = x;
+	char buffer[8];
+
+	sprintf_s(buffer, "%c", level[DanielGamePlayer->position.y][DanielGamePlayer->position.x]);
+
+	mvwprintw(win, DanielGamePlayer->position.y, DanielGamePlayer->position.x, buffer);
+
+	DanielGamePlayer->position.y = newPosition->y;
+	DanielGamePlayer->position.x = newPosition->x;
 	wattron(win, COLOR_PAIR(5));																		//functions related to movement
 	mvwprintw(win, DanielGamePlayer->position.y, DanielGamePlayer->position.x, "@");
 	move(DanielGamePlayer->position.y, DanielGamePlayer->position.x);
@@ -267,7 +293,10 @@ DanielPlayer * playerSetup(WINDOW * win)
 	newPlayer->position.y = 10;			//starting positions
 	newPlayer->position.x = 13;
 	newPlayer->health = 10;
-	playerMove(win, 10, 13, newPlayer);
+
+	mvwprintw(win, newPlayer->position.y, newPlayer->position.x, "@");
+	move(newPlayer->position.y, newPlayer->position.x);
+
 	return newPlayer;
 }
 //functions below are for the main menu. above are for daniel's game. 
@@ -698,7 +727,12 @@ int main()
 
 										char ** level;
 										int danielGameInput;
+										Position * newPosition;
+
 										mapSetup(danielGameWin);
+
+										level = saveLevelPositions(danielGameWin);
+
 										DanielGamePlayer = playerSetup(danielGameWin);				//main game initiations
 										int mainEloRating = DanielGamePlayer->eloRating;
 										mainEloRating = 1400;
@@ -709,7 +743,8 @@ int main()
 										while ((danielGameInput = getch()) != 'x')
 										{
 											
-											handlePlayerInput(danielGameWin, danielGameInput, DanielGamePlayer);
+											newPosition = handlePlayerInput(danielGameWin, danielGameInput, DanielGamePlayer);
+											checkPosition(danielGameWin, newPosition, DanielGamePlayer, level);
 											wrefresh(danielGameWin);
 										}
 
