@@ -817,7 +817,7 @@ int main()
 				string instructionString3 = "THE GAME WILL PRESENT YOU WITH A SERIES OF CHALLENGES ";
 				string instructionString4 = "IN THE FORM OF EMAILS FROM PAYING CUSTOMERS.          ";
 				string instructionString5 = "COMPLETE THEM AND YOU WILL PROGRESS ON YOUR PATH TO - ";
-				string instructionString6 = "BECOMING A FORMIDDABLE HACKER.                        ";
+				string instructionString6 = "BECOMING A FIRST CLASS HACKER.                        ";
 				wattron(howToPlay, COLOR_PAIR(6));
 				mvwprintw(howToPlay, 7, 7, instructionString.c_str());
 				mvwprintw(howToPlay, 8, 7, instructionString1.c_str());
