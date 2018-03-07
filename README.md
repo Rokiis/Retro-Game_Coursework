@@ -26,3 +26,4 @@ sudo apt-get install libncurses5-dev libncursesw5-dev - installs curses library 
 
 tutorial for ncurses - http://www.cs.ukzn.ac.za/~hughm/os/notes/ncurses.html
 
+http://creative.coventry.ac.uk/eh/ -- HACKING PUZZLES. EVERYONE PLEASE ATTEMPT! CAN ONLY BE ACCESSED THROUGH UNI WI-FI OR PC!
