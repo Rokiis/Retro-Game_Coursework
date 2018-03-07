@@ -43,16 +43,16 @@ Room ** mapSetup(WINDOW * window);
 //player
 DanielPlayer * playerSetup(WINDOW * win);
 Position * handlePlayerInput(WINDOW * win, int input, DanielPlayer * DanielGamePlayer);
-void checkPosition(WINDOW * win, Position * newPosition, DanielPlayer * DanielGamePlayer, char ** level);			
-void playerMove(WINDOW * win, Position * newPosition, DanielPlayer * DanielGamePlayer, char ** level);		
+void checkPosition(WINDOW * win, Position * newPosition, DanielPlayer * DanielGamePlayer, char ** level);
+void playerMove(WINDOW * win, Position * newPosition, DanielPlayer * DanielGamePlayer, char ** level);
 //room
-Room * createRoom(int y, int x, int height, int width);		
-void drawRoom(WINDOW * win, Room * room);													   
+Room * createRoom(int y, int x, int height, int width);
+void drawRoom(WINDOW * win, Room * room);
 int doorPath(WINDOW * win, Position * doorOne, Position * doorTwo);
 
 Position * handlePlayerInput(WINDOW * win, int input, DanielPlayer * DanielGamePlayer)
 {
-	
+
 	Position * newPosition;
 	newPosition = (Position *)malloc(sizeof(Position));
 	switch (input)
@@ -99,7 +99,7 @@ Room ** mapSetup(WINDOW * window)
 
 	rooms[0] = createRoom(10, 40, 7, 11);
 	drawRoom(window, rooms[0]);
-	
+
 	rooms[1] = createRoom(5, 5, 10, 11); //up/down, left/right, height, width
 	drawRoom(window, rooms[1]);
 
@@ -120,7 +120,7 @@ char ** saveLevelPositions(WINDOW * win)
 	char ** positions;
 	positions = (char **)(malloc(sizeof(char *) * 25));
 
-	for (y = 0; y < 25; y++) 
+	for (y = 0; y < 25; y++)
 	{
 		positions[y] = (char *)malloc(sizeof(char) * 100);
 		for (x = 0; x < 100; x++)
@@ -193,7 +193,7 @@ void drawRoom(WINDOW * win, Room * room)
 	mvwprintw(win, room->doors[1]->y, room->doors[1]->x, "+");
 	mvwprintw(win, room->doors[2]->y, room->doors[2]->x, "+");
 	mvwprintw(win, room->doors[3]->y, room->doors[3]->x, "+");
-	
+
 
 }
 int doorPath(WINDOW * win, Position * doorOne, Position * doorTwo)
@@ -222,7 +222,7 @@ int doorPath(WINDOW * win, Position * doorOne, Position * doorTwo)
 			previous.x = temp.x;
 			temp.x = temp.x + 1;
 		}																																	//path finding algorithm
-		//checks down
+		//checks down																																	
 		else if ((abs((temp.y + 1) - doorTwo->y) < abs(temp.y - doorTwo->y)) && (mvwinch(win, temp.y + 1, temp.x) == ' '))
 		{
 			previous.y = temp.y;
@@ -242,13 +242,13 @@ int doorPath(WINDOW * win, Position * doorOne, Position * doorTwo)
 				count++;
 				continue;
 			}
-			else 
+			else
 			{
 				return 0;
 			}
 		}
 		mvwprintw(win, temp.y, temp.x, "#");
-		
+
 	}
 
 	return 1;
@@ -258,14 +258,14 @@ void checkPosition(WINDOW * win, Position * newPosition, DanielPlayer * DanielGa
 	int space;
 	switch (mvwinch(win, newPosition->y, newPosition->x))		//checks character collision
 	{
-		case '.':
-		case '#':
-		case '+':
-			playerMove(win, newPosition, DanielGamePlayer, level);			//when next position is a '.', we can move
-			break;
-		default:
-			move(DanielGamePlayer->position.y, DanielGamePlayer->position.x);
-			break;
+	case '.':
+	case '#':
+	case '+':
+		playerMove(win, newPosition, DanielGamePlayer, level);			
+		break;
+	default:
+		move(DanielGamePlayer->position.y, DanielGamePlayer->position.x);
+		break;
 	}
 
 }
@@ -321,7 +321,7 @@ void printMiddle(WINDOW * win, int y, int x, int upDown, string asd) //function 
 
 int main()
 {
-	srand(time(NULL)); //windows only - random gen per session
+	srand(time(NULL)); //implement seed function
 
 	while (!mainMenuLoop)
 	{
@@ -722,7 +722,7 @@ int main()
 										wrefresh(danielGameWin);
 										getch();
 										wclear(danielGameWin);
-																									//daniel game stuff
+										//daniel game stuff
 
 
 										char ** level;
@@ -738,11 +738,11 @@ int main()
 										mainEloRating = 1400;
 										keypad(danielGameWin, true);
 										mvwprintw(danielGameWin, 1, 1, "Elo rating: %d", mainEloRating);
-										
+
 										wrefresh(danielGameWin);									//note: DanielGamePlayer is object of class DanielPlayer
 										while ((danielGameInput = getch()) != 'x')
 										{
-											
+
 											newPosition = handlePlayerInput(danielGameWin, danielGameInput, DanielGamePlayer);
 											checkPosition(danielGameWin, newPosition, DanielGamePlayer, level);
 											wrefresh(danielGameWin);
