@@ -13,6 +13,16 @@
 using namespace std;
 bool mainMenuLoop = false;
 
+typedef struct Level
+{
+	char ** tiles;
+	int level;
+	int numberOfRooms;
+	struct Room ** rooms;
+	struct Monster ** monsters;
+	int numberOfMonsters;
+} Level;
+
 typedef struct Position
 {
 	int x;
@@ -37,8 +47,8 @@ typedef struct DanielPlayer
 } DanielPlayer;
 
 //map
-Room ** mapSetup(WINDOW * window);
-
+Room ** roomSetup(WINDOW * window);
+char ** saveLevelPositions(WINDOW * win);
 //player
 DanielPlayer * playerSetup(WINDOW * win);
 Position * handlePlayerInput(WINDOW * win, int input, DanielPlayer * DanielGamePlayer);
@@ -91,27 +101,40 @@ Position * handlePlayerInput(WINDOW * win, int input, DanielPlayer * DanielGameP
 	return newPosition;
 
 }
-Room ** mapSetup(WINDOW * window)
+Level * createLevel(WINDOW * win, int level)
+{
+	Level * newLevel;
+	newLevel = (Level *)malloc(sizeof(Level));
+
+	newLevel->level = level;
+	newLevel->numberOfRooms = 3;
+	newLevel->rooms = roomSetup(win);
+	newLevel->tiles = saveLevelPositions(win);
+	return newLevel;
+
+}
+
+Room ** roomSetup(WINDOW * window)
 {
 	Room ** rooms;
 	rooms = (Room **)malloc(sizeof(Room) * 6);
 
-	vector<int> heightPicker = { 4, 5, 6, 7, 8};
+	vector<int> heightPicker = { 4, 5, 6, 7, 8 };
 	vector<int> widthPicker = { 7, 8, 9, 10, 11, 12 };
-	
+
 
 	/*
 	int rPicker1 = rand() % heightPicker.size();
 	int rPicker2 = rand() % widthPicker.size();
 	int rPicker3 = rand() % heightPicker.size();
 	int rPicker4 = rand() % widthPicker.size();
-													//work on
+	//work on
 	int rHeight1 = heightPicker[rPicker1];
 	int rWidth1 = widthPicker[rPicker2];
 	int rHeight2 = heightPicker[rPicker3];
 	int rWidth2 = widthPicker[rPicker4];
 	*/
-	
+
 	rooms[0] = createRoom(10, 40, 7, 11);
 	drawRoom(window, rooms[0]);
 
@@ -237,7 +260,7 @@ int doorPath(WINDOW * win, Position * doorOne, Position * doorTwo)
 			previous.x = temp.x;
 			temp.x = temp.x + 1;
 		}																																	//path finding algorithm
-		//checks down																																	
+																																			//checks down																																	
 		else if ((abs((temp.y + 1) - doorTwo->y) < abs(temp.y - doorTwo->y)) && (mvwinch(win, temp.y + 1, temp.x) == ' '))
 		{
 			previous.y = temp.y;
@@ -276,7 +299,7 @@ void checkPosition(WINDOW * win, Position * newPosition, DanielPlayer * DanielGa
 	case '.':
 	case '#':
 	case '+':
-		playerMove(win, newPosition, DanielGamePlayer, level);			
+		playerMove(win, newPosition, DanielGamePlayer, level);
 		break;
 	default:
 		move(DanielGamePlayer->position.y, DanielGamePlayer->position.x);
@@ -740,13 +763,14 @@ int main()
 										//daniel game stuff
 
 
-										char ** level;
+										
 										int danielGameInput;
 										Position * newPosition;
 
-										mapSetup(danielGameWin);
+										Level * level;
 
-										level = saveLevelPositions(danielGameWin);
+										level = createLevel(danielGameWin, 0);
+										
 
 										DanielGamePlayer = playerSetup(danielGameWin);				//main game initiations
 										int mainEloRating = DanielGamePlayer->eloRating;
@@ -759,7 +783,7 @@ int main()
 										{
 
 											newPosition = handlePlayerInput(danielGameWin, danielGameInput, DanielGamePlayer);
-											checkPosition(danielGameWin, newPosition, DanielGamePlayer, level);
+											checkPosition(danielGameWin, newPosition, DanielGamePlayer, level->tiles);
 											wrefresh(danielGameWin);
 										}
 
