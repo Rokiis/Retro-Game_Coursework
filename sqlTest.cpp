@@ -1,3 +1,4 @@
+#include "sqlite3.h"
 int main()
 {
 	srand(time(NULL)); //implement seed function
