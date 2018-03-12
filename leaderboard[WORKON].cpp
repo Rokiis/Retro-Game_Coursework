@@ -14,7 +14,7 @@ if (inputSecondScreen == "LEADERBOARD")
 								wattroff(leaderboard, COLOR_PAIR(1));
 
 								keypad(leaderboard, true);
-								string leaderboardChoices[1] = {"GO BACK" };
+								string leaderboardChoices[1] = { "GO BACK" };
 								int leaderboardChoice;
 								int leaderboardHighlight = 0;
 								while (1)
@@ -43,3 +43,17 @@ if (inputSecondScreen == "LEADERBOARD")
 									refresh();
 								}
 								wrefresh(leaderboard);
+							}
+						}
+						if (inputSecondScreen == "GO BACK TO MAIN MENU")
+						{
+							characterCreationLoop = true;
+							secondScreenLoop = true;
+							refresh();
+						}
+
+						wrefresh(secondScreenWin);
+					}
+
+
+				}
