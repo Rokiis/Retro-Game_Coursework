@@ -12,6 +12,19 @@
 
 using namespace std;
 bool mainMenuLoop = false;
+int mainEloRating = 1400;
+
+void testyTest(bool truefalse, WINDOW * win)
+{
+	if (truefalse == true)
+	{
+		wclear(win);
+	}
+	else
+	{
+
+	}
+}
 
 typedef struct Level
 {
@@ -19,8 +32,6 @@ typedef struct Level
 	int level;
 	int numberOfRooms;
 	struct Room ** rooms;
-	struct Monster ** monsters;
-	int numberOfMonsters;
 } Level;
 
 typedef struct Position
@@ -45,6 +56,15 @@ typedef struct DanielPlayer
 	int health;
 	int eloRating;
 } DanielPlayer;
+void printMiddle(WINDOW * win, int y, int x, int upDown, string asd) //function I created to print text within a window at the centre.
+{
+	int getLength = asd.length();									 //int upDown is buggy. 9 = top of screen, play around with it. 
+	int newY = (y / 2) - upDown;
+	int newX = (x - getLength) / 2;
+	mvwprintw(win, newY, newX, asd.c_str());
+}
+
+
 
 //map
 Room ** roomSetup(WINDOW * window);
@@ -52,7 +72,7 @@ char ** saveLevelPositions(WINDOW * win);
 //player
 DanielPlayer * playerSetup(WINDOW * win);
 Position * handlePlayerInput(WINDOW * win, int input, DanielPlayer * DanielGamePlayer);
-void checkPosition(WINDOW * win, Position * newPosition, DanielPlayer * DanielGamePlayer, char ** level);
+int checkPosition(WINDOW * win, Position * newPosition, DanielPlayer * DanielGamePlayer, char ** level);
 void playerMove(WINDOW * win, Position * newPosition, DanielPlayer * DanielGamePlayer, char ** level);
 //room
 Room * createRoom(int y, int x, int height, int width);
@@ -232,6 +252,10 @@ void drawRoom(WINDOW * win, Room * room)
 	mvwprintw(win, room->doors[2]->y, room->doors[2]->x, "+");
 	mvwprintw(win, room->doors[3]->y, room->doors[3]->x, "+");
 
+	//draw enemies
+
+	mvwprintw(win, 10, 10, "C"); //work on
+
 
 }
 int doorPath(WINDOW * win, Position * doorOne, Position * doorTwo)
@@ -260,7 +284,7 @@ int doorPath(WINDOW * win, Position * doorOne, Position * doorTwo)
 			previous.x = temp.x;
 			temp.x = temp.x + 1;
 		}																																	//path finding algorithm
-																																			//checks down																																	
+		//checks down																																	
 		else if ((abs((temp.y + 1) - doorTwo->y) < abs(temp.y - doorTwo->y)) && (mvwinch(win, temp.y + 1, temp.x) == ' '))
 		{
 			previous.y = temp.y;
@@ -291,7 +315,7 @@ int doorPath(WINDOW * win, Position * doorOne, Position * doorTwo)
 
 	return 1;
 }
-void checkPosition(WINDOW * win, Position * newPosition, DanielPlayer * DanielGamePlayer, char ** level)
+int checkPosition(WINDOW * win, Position * newPosition, DanielPlayer * DanielGamePlayer, char ** level)
 {
 	int space;
 	switch (mvwinch(win, newPosition->y, newPosition->x))		//checks character collision
@@ -300,6 +324,11 @@ void checkPosition(WINDOW * win, Position * newPosition, DanielPlayer * DanielGa
 	case '#':
 	case '+':
 		playerMove(win, newPosition, DanielGamePlayer, level);
+		break;
+	case 'C':
+		getch();
+		playerMove(win, newPosition, DanielGamePlayer, level);
+		return 69;
 		break;
 	default:
 		move(DanielGamePlayer->position.y, DanielGamePlayer->position.x);
@@ -347,13 +376,7 @@ public:
 	int strikes;			//used for main menu stats only
 	int cash;
 };
-void printMiddle(WINDOW * win, int y, int x, int upDown, string asd) //function I created to print text within a window at the centre.
-{
-	int getLength = asd.length();									 //int upDown is buggy. 9 = top of screen, play around with it. 
-	int newY = (y / 2) - upDown;
-	int newX = (x - getLength) / 2;
-	mvwprintw(win, newY, newX, asd.c_str());
-}
+
 
 
 
@@ -620,6 +643,7 @@ int main()
 
 								keypad(inboxMenu, true);
 								string inboxChoices[4] = { "EMAIL 1", "EMAIL 2", "EMAIL 3", "GO BACK" };
+								curs_set(0);
 								int inboxChoice;
 								int inboxHighlight = 0;
 								while (1)
@@ -759,38 +783,180 @@ int main()
 										wattroff(danielGameWin, COLOR_PAIR(69));
 										wrefresh(danielGameWin);
 										getch();
-										wclear(danielGameWin);
-										//daniel game stuff
-
-
-
-										int danielGameInput;
-										Position * newPosition;
-
-										Level * level;
-
-										level = createLevel(danielGameWin, 0);
-
-
-										DanielGamePlayer = playerSetup(danielGameWin);				//main game initiations
-										int mainEloRating = DanielGamePlayer->eloRating;
-										mainEloRating = 1400;
-										keypad(danielGameWin, true);
-										mvwprintw(danielGameWin, 1, 1, "Elo rating: %d", mainEloRating);
-
-										wrefresh(danielGameWin);									//note: DanielGamePlayer is object of class DanielPlayer
-										while ((danielGameInput = getch()) != 'x')
+										bool testLoop = false;
+										while (!testLoop)
 										{
+											bool danielMainGameLoop = false;
+											while (!danielMainGameLoop)
+											{
+												wclear(danielGameWin);
+												//daniel game stuff
 
-											newPosition = handlePlayerInput(danielGameWin, danielGameInput, DanielGamePlayer);
-											checkPosition(danielGameWin, newPosition, DanielGamePlayer, level->tiles);
-											wrefresh(danielGameWin);
+
+
+												int danielGameInput;
+
+												Position * newPosition;
+
+												Level * level;
+
+												level = createLevel(danielGameWin, 0);
+
+
+												DanielGamePlayer = playerSetup(danielGameWin);				//main game initiations
+
+
+												keypad(danielGameWin, true);
+												mvwprintw(danielGameWin, 0, 1, "Elo rating: %d", mainEloRating);
+												mvwprintw(danielGameWin, 0, 20, "Name: %s", mainPlayer.name.c_str());
+
+												wrefresh(danielGameWin);									//note: DanielGamePlayer is object of class DanielPlayer
+												while (danielGameInput = getch())
+												{
+													newPosition = handlePlayerInput(danielGameWin, danielGameInput, DanielGamePlayer);
+													int x = checkPosition(danielGameWin, newPosition, DanielGamePlayer, level->tiles);
+													wrefresh(danielGameWin);
+													if (x == 69)
+													{
+														bool battleLoop = false;
+														while (!battleLoop)
+															break;
+														{
+															WINDOW * battleWindow = newwin(20, 70, 1, 1);
+															refresh();
+															wborder(battleWindow, 0, 0, 0, 0, 0, 0, 0, 0);
+															int battleMaxY, battleMaxX;
+															getmaxyx(battleWindow, battleMaxY, battleMaxX);
+															printMiddle(battleWindow, battleMaxY, battleMaxX, 9, "TEST");
+															wrefresh(battleWindow);
+															keypad(battleWindow, true);
+															string battleChoices[4] = { "OPTION1", "OPTION2", "OPTION3", "OPTION4" };
+															int battleChoice;
+															int battleHighlight = 0;
+															while (1)
+															{
+																for (int i = 0; i < 5; i++)
+																{
+																	if (i == battleHighlight)
+																		wattron(battleWindow, A_REVERSE);
+																	if (i == 0)
+																	{
+																		mvwprintw(battleWindow, i + 7, 3, battleChoices[i].c_str());
+																	}
+																	if (i == 1)
+																	{
+																		mvwprintw(battleWindow, i + 6, 15, battleChoices[i].c_str());
+																	}
+																	if (i == 2)
+																	{
+																		mvwprintw(battleWindow, i + 8, 3, battleChoices[i].c_str());
+																	}
+																	if (i == 3)
+																	{
+																		mvwprintw(battleWindow, i + 7, 15, battleChoices[i].c_str());
+																	}
+																	wattroff(battleWindow, A_REVERSE);
+																}
+																battleChoice = wgetch(battleWindow);
+																switch (battleChoice)
+																{
+																case 'a':
+																case KEY_LEFT:
+																	battleHighlight--;
+																	if (battleHighlight == -1)
+																		battleHighlight = 0;
+																	if (battleHighlight == 1)
+																		battleHighlight = 2;
+																	if (battleHighlight == 0)
+																		battleHighlight = 0;
+																	if (battleHighlight == 2)
+																		battleHighlight = 2;
+																	break;
+																case 's':
+																case KEY_DOWN:
+																	battleHighlight--, battleHighlight--;
+																	if (battleHighlight == -2)
+																		battleHighlight = 2;
+																	if (battleHighlight == -1)
+																		battleHighlight = 3;
+																	if (battleHighlight == 0)
+																		battleHighlight = 2;
+																	if (battleHighlight == 1)
+																		battleHighlight = 3;
+																	break;
+																case 'd':
+																case KEY_RIGHT:
+																	battleHighlight++;							//calculations to get menu for game, logic is simple - if highlight is equal to number in array that it will be (after applying ++ or --), then go to x element of array.
+																	if (battleHighlight == 1)
+																		battleHighlight = 1;
+																	if (battleHighlight == 2)
+																		battleHighlight = 1;
+																	if (battleHighlight == 2)
+																		battleHighlight = 3;
+																	if (battleHighlight == 4)
+																		battleHighlight = 3;
+																	break;
+																case 'w':
+																case KEY_UP:
+																	battleHighlight++, battleHighlight++;
+																	if (battleHighlight == 2)
+																		battleHighlight = 0;
+																	if (battleHighlight == 3)
+																		battleHighlight = 1;
+																	if (battleHighlight == 4)
+																		battleHighlight = 0;
+																	if (battleHighlight == 5)
+																		battleHighlight = 1;
+																	break;
+																default:
+																	break;
+																}
+																if (battleChoice == 10)
+																	break;
+															}
+															string inputBattle = battleChoices[battleHighlight];
+															wrefresh(battleWindow);
+															if (inputBattle == "OPTION1")
+															{
+																break;
+															}
+															else
+															{
+																break;
+															}
+															wrefresh(battleWindow);
+														}
+
+													}
+													if (danielGameInput == 'x')
+													{
+														endwin();
+														wclear(danielGameWin);
+														danielMainGameLoop = true;
+														testLoop = true;
+														break;
+														refresh();
+														curs_set(0);
+
+													}
+												
+												}
+												endwin();
+												danielGameLoop = true;
+												refresh();
+
+												
+
+
+											}
+											
+											
 										}
-
-										endwin();
-										danielGameLoop = true;
-										refresh();
+										
+										
 									}
+									
+										
 								}
 
 								if (inboxMenuInput == "GO BACK")
