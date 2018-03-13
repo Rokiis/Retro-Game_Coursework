@@ -65,4 +65,14 @@ int main()
       }
    }
    sqlite3_free_table(results);
+   // Close Database
+   cout << "Closing MyDb.db ..." << endl;
+   sqlite3_close(db);
+   cout << "Closed MyDb.db" << endl << endl;
+ 
+   // Wait For User To Close Program
+   cout << "Please press any key to exit the program ..." << endl;
+   cin.get();
+ 
+   return 0;
 }
