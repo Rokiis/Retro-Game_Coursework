@@ -3,16 +3,29 @@
 #include <string>
 #include <algorithm>
 #include "sqlite3.h"
+#include <ctime>
 using namespace std;
 bool miningLoop = false;
+int passiveIncome(int time1, int time2, int mult)
+{
+    int diff = time2 - time1;
+    if(diff>=10)
+    {
+       int gain = (diff/10)*mult;
+       return gain;
+    }
+    else
+        return 0;
+}
 class MainGamePlayer
 {
 public:
 	string name;
 	int strikes;			//used for main menu stats only
 	int cash;
-    int perclick;
-    int passiveMine;
+    int perClick;
+    int passive;
+    time_t lastOnline;
 };
 void printMiddle(WINDOW * win, int y, int x, int upDown, string asd) 
 {
@@ -22,21 +35,31 @@ void printMiddle(WINDOW * win, int y, int x, int upDown, string asd)
 	mvwprintw(win, newY, newX, asd.c_str());
 }
 int main()
-{
+{    
     MainGamePlayer mainPlayer;
-    mainPlayer.perclick = 1;
-    mainPlayer.passiveMine = 10;
-   int rc;
-   sqlite3 *db;
-   rc = sqlite3_open("stux_base.db", &db);
-   sqlite3_stmt * stmt = nullptr;
-   string sqlSelect = "SELECT cash, strikes FROM mainGamePlayer where name = 'Nick';";
-   sqlite3_prepare(db, sqlSelect.c_str(), sqlSelect.size(), &stmt, nullptr);
-   sqlite3_step(stmt);
-   mainPlayer.cash =  sqlite3_column_int(stmt, 0);
-   mainPlayer.strikes =  sqlite3_column_int(stmt, 1); 
-   sqlite3_finalize(stmt);
-   sqlite3_close(db);
+    int rc;
+    sqlite3 *db;
+    rc = sqlite3_open("stux_base.db", &db);
+    sqlite3_stmt * stmt;
+    string sqlSelect = "SELECT cash, strikes,lastOnline FROM mainGamePlayer where name = 'Nick';";
+    sqlite3_prepare(db, sqlSelect.c_str(), sqlSelect.size(), &stmt, nullptr);
+    sqlite3_step(stmt);
+    mainPlayer.cash =  sqlite3_column_int(stmt, 0);
+    mainPlayer.strikes =  sqlite3_column_int(stmt, 1); 
+    mainPlayer.lastOnline =  sqlite3_column_int(stmt, 2);
+    sqlite3_finalize(stmt);
+    sqlSelect = "SELECT perClick, passive FROM dataMining where name = 'Nick';";
+    sqlite3_prepare(db, sqlSelect.c_str(), sqlSelect.size(), &stmt, nullptr);
+    sqlite3_step(stmt);
+    mainPlayer.perClick = sqlite3_column_int(stmt, 0);
+    mainPlayer.passive = sqlite3_column_int(stmt, 1);
+    
+    int gain = passiveIncome(mainPlayer.lastOnline, time(nullptr), mainPlayer.passive);
+    mainPlayer.cash += gain;
+    sqlite3_finalize(stmt); 
+    sqlite3_close(db);
+    //cout<<mainPlayer.lastOnline<<endl;
+    //cout<< time(nullptr)<<endl;
     while(!miningLoop)
     {
         
@@ -47,8 +70,6 @@ int main()
         WINDOW * miningMenu = newwin(20, 70 , 1 , 1);
         refresh();
         wborder(miningMenu, 0 , 0 , 0 , 0 , 0 , 0 , 0, 0);
-        mainPlayer.cash;
-        
         string miningTitle = "Data mining rig";
         int miningMaxY, miningMaxX;
         getmaxyx(miningMenu, miningMaxY, miningMaxX);
@@ -90,20 +111,20 @@ int main()
             if(miningMenuOptions[i] == "Mine")
                 {
                     wattron(miningMenu, COLOR_PAIR(69));
-                        mvwprintw(miningMenu, 5*i+3 , 8,"+%d", mainPlayer.perclick);
+                        mvwprintw(miningMenu, 5*i+3 , 8,"+%d", mainPlayer.perClick);
                     wattroff(miningMenu,COLOR_PAIR(69));
                 }
                 if(miningMenuOptions[i] == "Upgrade manual mining")
                 {
                     wattron(miningMenu, COLOR_PAIR(69));
-                        mvwprintw(miningMenu, 5*i+3 , 25,"costs: %d",100*mainPlayer.perclick);
+                        mvwprintw(miningMenu, 5*i+3 , 25,"costs: %d",100*mainPlayer.perClick);
                     wattroff(miningMenu,COLOR_PAIR(69));
                 }
                 if(miningMenuOptions[i] == "Upgrade passive mining rig")
                 {
                    wattron(miningMenu, COLOR_PAIR(69));
-                        mvwprintw(miningMenu, 5*i+3 , 26,"earning: %d/h",mainPlayer.passiveMine);
-                        mvwprintw(miningMenu, 5*i+3 , 41,"costs: %d",50*mainPlayer.passiveMine);
+                        mvwprintw(miningMenu, 5*i+3 , 26,"earning: %d/10sec",mainPlayer.passive);
+                        mvwprintw(miningMenu, 5*i+3 , 43,"costs: %d",50*mainPlayer.passive);
                    wattroff(miningMenu,COLOR_PAIR(69)); 
                 }
             }
@@ -138,7 +159,7 @@ int main()
         }
         if(miningMenuInput == "Mine")
         {
-            mainPlayer.cash+=mainPlayer.perclick;
+            mainPlayer.cash+=mainPlayer.perClick;
             wattron(miningMenu, COLOR_PAIR(5));
                 mvwprintw(miningMenu, 1, 55, "CASH: %d", mainPlayer.cash);
             wattroff(miningMenu, COLOR_PAIR(5));
@@ -146,32 +167,39 @@ int main()
         }
         if(miningMenuInput == "Upgrade manual mining")
         {
-            if(mainPlayer.cash>=100*mainPlayer.perclick)
+            if(mainPlayer.cash>=100*mainPlayer.perClick)
             {
-                mainPlayer.cash-=100*mainPlayer.perclick;
-                mainPlayer.perclick+=1;
+                mainPlayer.cash-=100*mainPlayer.perClick;
+                mainPlayer.perClick+=1;
             }
             
         }
         if(miningMenuInput == "Upgrade passive mining rig")
         {
-            if(mainPlayer.cash>=50*mainPlayer.passiveMine)
+            if(mainPlayer.cash>=50*mainPlayer.passive)
             {
-                mainPlayer.cash-=50*mainPlayer.passiveMine;
-                mainPlayer.passiveMine+=10;
+                mainPlayer.cash-=50*mainPlayer.passive;
+                mainPlayer.passive+=1;
             }
         }
         wrefresh(miningMenu);
         }
     endwin();
+    mainPlayer.lastOnline = time(nullptr);
     rc = sqlite3_open("stux_base.db", &db);
-    sqlSelect = "UPDATE mainGamePlayer SET cash = ? WHERE name = 'Nick'";
-    
-    cout<<sqlite3_errmsg(db);
+    sqlSelect = "UPDATE mainGamePlayer SET cash = ?, lastOnline = ? WHERE name = 'Nick'";
     sqlite3_prepare(db, sqlSelect.c_str(), sqlSelect.size(), &stmt, nullptr);
     sqlite3_bind_int(stmt, 1, mainPlayer.cash);
+    sqlite3_bind_int(stmt, 2, mainPlayer.lastOnline);
+    sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
+    sqlSelect = "UPDATE dataMining SET perClick = ?, passive = ?  WHERE name = 'Nick'";         
+    sqlite3_prepare(db, sqlSelect.c_str(), sqlSelect.size(), &stmt, nullptr);
+    sqlite3_bind_int(stmt, 1, mainPlayer.perClick);
+    sqlite3_bind_int(stmt, 2, mainPlayer.passive);
     sqlite3_step(stmt);
     sqlite3_finalize(stmt);
     sqlite3_close(db);
+    //cout<<mainPlayer.lastOnline<<endl;
    }
     
