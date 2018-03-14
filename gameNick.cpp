@@ -1,3 +1,5 @@
+//g++ --std=c++0x gameNick.cpp -o gameNick -lcurses -lsqlite3
+//you need to enter that to run 
 #include <iostream>
 #include <ncurses.h>
 #include <string>
@@ -53,7 +55,6 @@ int main()
     sqlite3_step(stmt);
     mainPlayer.perClick = sqlite3_column_int(stmt, 0);
     mainPlayer.passive = sqlite3_column_int(stmt, 1);
-    
     int gain = passiveIncome(mainPlayer.lastOnline, time(nullptr), mainPlayer.passive);
     mainPlayer.cash += gain;
     sqlite3_finalize(stmt); 
@@ -124,10 +125,12 @@ int main()
                 {
                    wattron(miningMenu, COLOR_PAIR(69));
                         mvwprintw(miningMenu, 5*i+3 , 26,"earning: %d/10sec",mainPlayer.passive);
-                        mvwprintw(miningMenu, 5*i+3 , 43,"costs: %d",50*mainPlayer.passive);
+                        mvwprintw(miningMenu, 5*i+3 , 50,"costs: %d",50*mainPlayer.passive);
                    wattroff(miningMenu,COLOR_PAIR(69)); 
                 }
             }
+            wattron(miningMenu, COLOR_PAIR(5));
+            mvwprintw(miningMenu, 18, 19, "You got £%d from passive mining", gain);
         miningMenuChoice = wgetch(miningMenu);
         switch(miningMenuChoice)
         {
