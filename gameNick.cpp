@@ -1,5 +1,5 @@
 //g++ --std=c++0x gameNick.cpp -o gameNick -lcurses -lsqlite3
-//you need to enter that to run 
+//you need to enter that to run the game in linux
 #include <iostream>
 #include <ncurses.h>
 #include <string>
