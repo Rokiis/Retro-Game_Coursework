@@ -1,5 +1,5 @@
 //g++ --std=c++0x gameNick.cpp -o gameNick -lcurses -lsqlite3
-//you need to enter that to run the game in linux
+//you need to enter that to run 
 #include <iostream>
 #include <ncurses.h>
 #include <string>
@@ -22,7 +22,7 @@ int passiveIncome(int time1, int time2, int mult)
 class MainGamePlayer
 {
 public:
-	string name;
+	string userName;
 	int strikes;			//used for main menu stats only
 	int cash;
     int perClick;
@@ -43,14 +43,14 @@ int main()
     sqlite3 *db;
     rc = sqlite3_open("stux_base.db", &db);
     sqlite3_stmt * stmt;
-    string sqlSelect = "SELECT cash, strikes,lastOnline FROM mainGamePlayer where name = 'Nick';";
+    string sqlSelect = "SELECT cash, strikes,lastOnline FROM mainGamePlayer where userName = 'Nick'";
     sqlite3_prepare(db, sqlSelect.c_str(), sqlSelect.size(), &stmt, nullptr);
     sqlite3_step(stmt);
     mainPlayer.cash =  sqlite3_column_int(stmt, 0);
     mainPlayer.strikes =  sqlite3_column_int(stmt, 1); 
     mainPlayer.lastOnline =  sqlite3_column_int(stmt, 2);
     sqlite3_finalize(stmt);
-    sqlSelect = "SELECT perClick, passive FROM dataMining where name = 'Nick';";
+    sqlSelect = "SELECT perClick, passive FROM dataMining where userName = 'Nick'";
     sqlite3_prepare(db, sqlSelect.c_str(), sqlSelect.size(), &stmt, nullptr);
     sqlite3_step(stmt);
     mainPlayer.perClick = sqlite3_column_int(stmt, 0);
@@ -162,6 +162,10 @@ int main()
         }
         if(miningMenuInput == "Mine")
         {
+            wgetch(miningMenu);
+            wgetch(miningMenu);
+            //wgetch(miningMenu);
+            //wgetch(miningMenu);
             mainPlayer.cash+=mainPlayer.perClick;
             wattron(miningMenu, COLOR_PAIR(5));
                 mvwprintw(miningMenu, 1, 55, "CASH: %d", mainPlayer.cash);
@@ -190,13 +194,13 @@ int main()
     endwin();
     mainPlayer.lastOnline = time(nullptr);
     rc = sqlite3_open("stux_base.db", &db);
-    sqlSelect = "UPDATE mainGamePlayer SET cash = ?, lastOnline = ? WHERE name = 'Nick'";
+    sqlSelect = "UPDATE mainGamePlayer SET cash = ?, lastOnline = ? WHERE userName = 'Nick'";
     sqlite3_prepare(db, sqlSelect.c_str(), sqlSelect.size(), &stmt, nullptr);
     sqlite3_bind_int(stmt, 1, mainPlayer.cash);
     sqlite3_bind_int(stmt, 2, mainPlayer.lastOnline);
     sqlite3_step(stmt);
     sqlite3_finalize(stmt);
-    sqlSelect = "UPDATE dataMining SET perClick = ?, passive = ?  WHERE name = 'Nick'";         
+    sqlSelect = "UPDATE dataMining SET perClick = ?, passive = ?  WHERE userName = 'Nick'";         
     sqlite3_prepare(db, sqlSelect.c_str(), sqlSelect.size(), &stmt, nullptr);
     sqlite3_bind_int(stmt, 1, mainPlayer.perClick);
     sqlite3_bind_int(stmt, 2, mainPlayer.passive);
@@ -205,4 +209,11 @@ int main()
     sqlite3_close(db);
     //cout<<mainPlayer.lastOnline<<endl;
    }
-    
+/*
+   select mainGamePlayer.userName, cash, bank, perClick, hangman
+   from mainGamePlayer
+   inner join dataMining
+   on mainGamePlayer.ID= dataMining.ID
+   inner join minigameScores
+   on dataMining.ID = minigameScores.ID;
+   */
