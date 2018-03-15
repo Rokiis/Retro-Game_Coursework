@@ -1,5 +1,5 @@
-#ifndef QUIZ_H
-#define QUIZ_H
+#ifndef GAME_H
+#define GAME_H
 
 
 
