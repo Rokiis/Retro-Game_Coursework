@@ -456,7 +456,7 @@ vec2ui cur_size;
 			sqlite3 *db;
 			rc = sqlite3_open("stux_base.db", &db);
 			sqlite3_stmt * stmt;
-			int highscore;
+			int highscore; // FOR DAN, MAKE SURE YOU CHANGE NICK TO WHATEVER IT WILL BE... ///////////////////////////////////////////////////
 			string sqlSelect = "SELECT brickBreaker FROM minigameScores where userName = 'Nick'";//Takes highscore from database and compares with curent score.
 			sqlite3_prepare(db, sqlSelect.c_str(), sqlSelect.size(), &stmt, nullptr);
 			sqlite3_step(stmt);
@@ -469,7 +469,7 @@ vec2ui cur_size;
 			std::string s = std::to_string(finalscore);//Pushes curent score to database.
 			sqlSelect = "UPDATE minigameScores SET brickBreaker = ";
 			sqlSelect.append(s);
-			string end = " WHERE userName = 'Nick'";
+			string end = " WHERE userName = 'Nick'";// MAKE SURE YOU CHANGE THIS ONE AS WELL///////////////////////////////////////////////////////////////////
 			sqlSelect.append(end);
 			sqlite3_prepare(db, sqlSelect.c_str(), sqlSelect.size(), &stmt, nullptr);
 			sqlite3_step(stmt);
