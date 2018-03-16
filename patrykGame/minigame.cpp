@@ -1,4 +1,4 @@
-//g++  minigame.cpp -lncurses -lsqlite3 -o game1  - compiles the code
+//g++ --std=c++0x  minigame.cpp -lncurses -lsqlite3 -o game1  - compiles the code
 #include "money_rush.h"
 #include "sqlite3.h"
 
