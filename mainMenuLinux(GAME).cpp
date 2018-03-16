@@ -8,6 +8,8 @@
 #include <time.h>
 #include <vector>
 #include <stdlib.h>
+#include "sqlite3.h"
+#include <ctime>
 using namespace std;
 bool mainMenuLoop = false;
 
@@ -204,10 +206,25 @@ DanielPlayer * playerSetup(WINDOW * win)
 class MainGamePlayer
 {
 public:
-	string name;
+	string userName;
 	int strikes;			//used for main menu stats only
 	int cash;
+    int bank;
+    int perClick;
+    int passive;
+    time_t lastOnline;
 };
+int passiveIncome(int time1, int time2, int mult)
+{
+    int diff = time2 - time1;
+    if(diff>=10)
+    {
+       int gain = (diff/10)*mult;
+       return gain;
+    }
+    else
+        return 0;
+}
 void printMiddle(WINDOW * win, int y, int x, int upDown, string asd) //function I created to print text within a window at the centre.
 {
 	int getLength = asd.length();									 //int upDown is buggy. 9 = top of screen, play around with it. 
@@ -221,12 +238,14 @@ void printMiddle(WINDOW * win, int y, int x, int upDown, string asd) //function 
 
 int main()
 {
+    DanielPlayer * DanielGamePlayer;
+    MainGamePlayer mainPlayer;
 	srand(time(NULL)); //random gen per session, implement seed feature
 
 	while (!mainMenuLoop)
 	{
-		DanielPlayer * DanielGamePlayer;
-		MainGamePlayer mainPlayer;
+		
+        
 		initscr();
 		curs_set(0);
 		noecho(); //turns off showing what key the user pressed
@@ -374,15 +393,34 @@ int main()
 					echo();
 					curs_set(1);
 					wrefresh(inboxMenu);
-					mvwscanw(inboxMenu, 14, 2, "%s", mainPlayer.name.c_str());
+					mvwscanw(inboxMenu, 14, 2, "%s", mainPlayer.userName.c_str());
 					wrefresh(inboxMenu);
 					noecho();
 					curs_set(0);
-					mvwprintw(inboxMenu, 14, 2, "WELCOME, %s. Press any key to continue...", mainPlayer.name.c_str());
-					mainPlayer.cash = 0;
-					mainPlayer.strikes = 0;
-					string playerSessionStrikes = " ";									//important value
-
+					mvwprintw(inboxMenu, 14, 2, "WELCOME, %s. Press any key to continue...", mainPlayer.userName.c_str());
+                    cout<<mainPlayer.userName<<endl;
+                    int rc;
+                    sqlite3 *db;
+                    rc = sqlite3_open("stux_base.db", &db);
+                    sqlite3_stmt * stmt;
+                    string sqlSelect = "SELECT cash, strikes,lastOnline FROM mainGamePlayer where userName = ?";
+                    sqlite3_prepare(db, sqlSelect.c_str(), sqlSelect.size(), &stmt, nullptr);
+                    sqlite3_step(stmt);
+                    sqlite3_bind_text(stmt, 1, mainPlayer.userName.c_str(), mainPlayer.userName.size(), NULL);
+                    mainPlayer.cash =  sqlite3_column_int(stmt, 0);
+                    mainPlayer.strikes =  sqlite3_column_int(stmt, 1); 
+                    mainPlayer.lastOnline =  sqlite3_column_int(stmt, 2);
+                    sqlite3_finalize(stmt);
+                    sqlSelect = "SELECT perClick, passive FROM dataMining where userName = ?";
+                    sqlite3_prepare(db, sqlSelect.c_str(), sqlSelect.size(), &stmt, nullptr);
+                    sqlite3_step(stmt);
+                    sqlite3_bind_text(stmt, 1, mainPlayer.userName.c_str(), mainPlayer.userName.size(), NULL);
+                    mainPlayer.perClick = sqlite3_column_int(stmt, 0);
+                    mainPlayer.passive = sqlite3_column_int(stmt, 1);
+                    int gain = passiveIncome(mainPlayer.lastOnline, time(nullptr), mainPlayer.passive);
+                    mainPlayer.cash += gain;
+                    sqlite3_finalize(stmt); 
+                    sqlite3_close(db);
 					wrefresh(inboxMenu);
 					getch();
 					bool secondScreenLoop = false;
@@ -399,18 +437,18 @@ int main()
 						wattroff(secondScreenWin, COLOR_PAIR(1));
 
 						wattron(secondScreenWin, COLOR_PAIR(4));
-						mvwprintw(secondScreenWin, 1, 2, "NAME: %s", mainPlayer.name.c_str());
+						mvwprintw(secondScreenWin, 1, 2, "NAME: %s", mainPlayer.userName.c_str());
 						wattroff(secondScreenWin, COLOR_PAIR(4));
 						wattron(secondScreenWin, COLOR_PAIR(5));
 						mvwprintw(secondScreenWin, 1, 55, "CASH: %d", mainPlayer.cash);
 						wattroff(secondScreenWin, COLOR_PAIR(5));
 						wattron(secondScreenWin, COLOR_PAIR(69));
-						mvwprintw(secondScreenWin, 3, 31, "STRIKES: %s", playerSessionStrikes.c_str());
+						mvwprintw(secondScreenWin, 3, 31, "STRIKES: %d", mainPlayer.strikes);
 						wattroff(secondScreenWin, COLOR_PAIR(69));
 
 						wattron(secondScreenWin, COLOR_PAIR(2));
 						keypad(secondScreenWin, true);
-						string secondScreenChoices[5] = { "INBOX", "BANK", "INVENTORY", "LEADERBOARDS", "GO BACK TO MAIN MENU" };
+						string secondScreenChoices[5] = { "INBOX", "BANK", "Data Mining", "LEADERBOARDS", "GO BACK TO MAIN MENU" };
 						int secondScreenChoice;
 						int secondScreenHighlight = 0;
 						while (1)
@@ -445,6 +483,128 @@ int main()
 						}
 						string inputSecondScreen = secondScreenChoices[secondScreenHighlight];
 						wrefresh(secondScreenWin);
+                        if(inputSecondScreen == "Data Mining" )
+                        {
+                            bool miningLoop = false;
+                            while(!miningLoop)
+                            {
+
+                                initscr();
+                                noecho();
+                                curs_set(0);
+                                start_color();
+                                WINDOW * miningMenu = newwin(20, 70 , 1 , 1);
+                                refresh();
+                                wborder(miningMenu, 0 , 0 , 0 , 0 , 0 , 0 , 0, 0);
+                                string miningTitle = "Data mining rig";
+                                int miningMaxY, miningMaxX;
+                                getmaxyx(miningMenu, miningMaxY, miningMaxX);
+                                wattron(miningMenu, COLOR_PAIR(1));
+                                printMiddle(miningMenu, miningMaxY,miningMaxX, 9 ,miningTitle);
+                                wattroff(miningMenu, COLOR_PAIR(1));
+                                wattron(miningMenu, COLOR_PAIR(5));
+                                    mvwprintw(miningMenu, 1, 55, "CASH: %d", mainPlayer.cash);
+                                wattroff(miningMenu, COLOR_PAIR(5));
+                                keypad(miningMenu, true);
+                                string miningMenuOptions[4] = {"Mine","Upgrade manual mining", "Upgrade passive mining rig", "Go back"};
+                                int miningMenuChoice;
+                                int miningMenuHighlight = 0;
+                                while(1)
+                                {
+                                    wattron(miningMenu, COLOR_PAIR(2));
+                                    for(int i=0; i<4;i++)
+                                    {
+                                        if(i == miningMenuHighlight)
+                                            wattron(miningMenu, A_REVERSE);
+                                        mvwprintw(miningMenu, 5*i + 3, 3, miningMenuOptions[i].c_str());
+                                        wattroff(miningMenu, A_REVERSE); 
+                                    }
+                                    wattroff(miningMenu, COLOR_PAIR(2));
+                                    for(int i =0; i<4;i++)
+                                    {
+                                    if(miningMenuOptions[i] == "Mine")
+                                        {
+                                            wattron(miningMenu, COLOR_PAIR(69));
+                                                mvwprintw(miningMenu, 5*i+3 , 8,"+%d", mainPlayer.perClick);
+                                            wattroff(miningMenu,COLOR_PAIR(69));
+                                        }
+                                        if(miningMenuOptions[i] == "Upgrade manual mining")
+                                        {
+                                            wattron(miningMenu, COLOR_PAIR(69));
+                                                mvwprintw(miningMenu, 5*i+3 , 25,"costs: %d",100*mainPlayer.perClick);
+                                            wattroff(miningMenu,COLOR_PAIR(69));
+                                        }
+                                        if(miningMenuOptions[i] == "Upgrade passive mining rig")
+                                        {
+                                           wattron(miningMenu, COLOR_PAIR(69));
+                                                mvwprintw(miningMenu, 5*i+3 , 26,"earning: %d/10sec",mainPlayer.passive);
+                                                mvwprintw(miningMenu, 5*i+3 , 50,"costs: %d",50*mainPlayer.passive);
+                                           wattroff(miningMenu,COLOR_PAIR(69)); 
+                                        }
+                                    }
+                                    wattron(miningMenu, COLOR_PAIR(5));
+                                    mvwprintw(miningMenu, 18, 19, "You got £%d from passive mining", gain);
+                                miningMenuChoice = wgetch(miningMenu);
+                                switch(miningMenuChoice)
+                                {
+                                        case KEY_UP:
+                                            miningMenuHighlight--;
+                                            if(miningMenuHighlight == -1)
+                                                miningMenuHighlight = 3;
+                                            break;
+                                        case KEY_DOWN:
+                                            miningMenuHighlight++;
+                                            if(miningMenuHighlight == 4)
+                                                miningMenuHighlight = 0;
+                                            break;
+                                        default:
+                                            break;
+                                }
+
+                                if(miningMenuChoice == 10)
+                                    break;
+                                }
+
+                                string miningMenuInput = miningMenuOptions[miningMenuHighlight];
+                                wrefresh(miningMenu);
+                                if(miningMenuInput == "Go back")
+                                {
+                                    miningLoop = true;
+                                    refresh();
+
+                                }
+                                if(miningMenuInput == "Mine")
+                                {
+                                    wgetch(miningMenu);
+                                    wgetch(miningMenu);
+                                    //wgetch(miningMenu);
+                                    //wgetch(miningMenu);
+                                    mainPlayer.cash+=mainPlayer.perClick;
+                                    wattron(miningMenu, COLOR_PAIR(5));
+                                        mvwprintw(miningMenu, 1, 55, "CASH: %d", mainPlayer.cash);
+                                    wattroff(miningMenu, COLOR_PAIR(5));
+                                    refresh();
+                                }
+                                if(miningMenuInput == "Upgrade manual mining")
+                                {
+                                    if(mainPlayer.cash>=100*mainPlayer.perClick)
+                                    {
+                                        mainPlayer.cash-=100*mainPlayer.perClick;
+                                        mainPlayer.perClick+=1;
+                                    }
+
+                                }
+                                if(miningMenuInput == "Upgrade passive mining rig")
+                                {
+                                    if(mainPlayer.cash>=50*mainPlayer.passive)
+                                    {
+                                        mainPlayer.cash-=50*mainPlayer.passive;
+                                        mainPlayer.passive+=1;
+                                    }
+                                }
+                                wrefresh(miningMenu);
+                                }
+                        }
 						if (inputSecondScreen == "INBOX")
 						{
 							bool inboxLoop = false;
@@ -650,6 +810,7 @@ int main()
 									refresh();
 								}
 
+                                
 
 							}
 						}
@@ -659,6 +820,146 @@ int main()
 							secondScreenLoop = true;
 							refresh();
 						}
+                        /////////////////////////////////////////////
+                        if (inputSecondScreen == "BANK")
+                        {
+                            bool bankLoop = false;
+                            while(!bankLoop)
+                            {
+                                
+                            int depositAmount = 0;
+                            int withdrawAmount = 0;
+                            wrefresh(secondScreenWin);
+                            WINDOW * bankMenu = newwin(20, 70, 1, 1);
+							refresh();
+							wborder(bankMenu, 0, 0, 0, 0, 0, 0, 0, 0);
+							wattron(bankMenu, COLOR_PAIR(1));
+							int bankMaxY, bankMaxX;
+							getmaxyx(bankMenu, bankMaxY, bankMaxX);
+							printMiddle(bankMenu, bankMaxY, bankMaxX, 9, "BANK");
+							wattroff(bankMenu, COLOR_PAIR(1));
+                            wattron(bankMenu, COLOR_PAIR(5));
+                                printMiddle(bankMenu, bankMaxY, bankMaxX, 8, "Current balance: ");
+                                mvwprintw(bankMenu, 2, 43, "£%d", mainPlayer.bank);    
+                            wattroff(bankMenu, COLOR_PAIR(5));    
+							keypad(bankMenu, true);
+                            string bankMenuOptions[3] = {"Withdraw","Deposit","Go back"};
+                            int bankChoice;
+                            int bankMenuHighlight = 0;
+                            while(1)
+                            {
+                                wattron(bankMenu, COLOR_PAIR(2));
+                                for(int i=0; i<3;i++)
+                                {
+                                   if(i == bankMenuHighlight)
+                                        wattron(bankMenu, A_REVERSE);
+                                   mvwprintw(bankMenu, 5 + 2*i, 3, bankMenuOptions[i].c_str());
+                                   wattroff(bankMenu, A_REVERSE);  
+                                }
+                                wattroff(bankMenu, COLOR_PAIR(2));
+                                for(int i=0; i<3;i++)
+                                {
+                                    if(i == 0)
+                                    {
+                                        wattron(bankMenu, COLOR_PAIR(69));
+                                        mvwprintw(bankMenu, 5 + 2*i , 12,"(1/5th of sum is taken as tax)");
+                                        wattroff(bankMenu,COLOR_PAIR(69));
+                                    }
+                                    if(i==1)
+                                    {
+                                        wattron(bankMenu,COLOR_PAIR(69));
+                                        mvwprintw(bankMenu, 5+ 2*i, 12,"(Free)");
+                                        wattroff(bankMenu,COLOR_PAIR(69));
+                                    }
+                                }
+                                bankChoice = wgetch(bankMenu);
+                                switch(bankChoice)
+                                {
+                                          case KEY_UP:
+                                            bankMenuHighlight--;
+                                            if(bankMenuHighlight == -1)
+                                                bankMenuHighlight = 2;
+                                            break;
+                                          case KEY_DOWN:
+                                            bankMenuHighlight++;
+                                            if(bankMenuHighlight == 3)
+                                                bankMenuHighlight = 0;
+                                            break;
+                                          default:
+                                            break;
+                                }
+                                if(bankChoice == 10)
+                                    break;
+                            }
+                                string bankMenuInput = bankMenuOptions[bankMenuHighlight];
+                                wrefresh(bankMenu);
+                                if(bankMenuInput == "Go back")
+                                {
+                                    bankLoop = true;
+                                    refresh();
+                                }
+                                if(bankMenuInput == "Deposit")
+                                {
+                                    string cheating = "Stop stealing";
+                                    echo();
+                                    curs_set(1);
+                                    wrefresh(bankMenu);
+                                    mvwscanw(bankMenu, 14, 2, "%d", &depositAmount);
+                                    wrefresh(bankMenu);
+                                    noecho();
+                                    curs_set(0);
+                                    refresh();
+                                    if(depositAmount<= mainPlayer.cash)
+                                    {
+                                        if(mainPlayer.bank+depositAmount>0)
+                                        {
+                                            if(depositAmount<0)
+                                            {
+                                                
+                                            }
+                                            else
+                                            {
+                                                mainPlayer.cash-=depositAmount;
+                                                mainPlayer.bank+=depositAmount;
+                                                //cout<<depositAmount<<endl;
+                                                //cout<<mainPlayer.bank<<endl;
+                                                mvwprintw(bankMenu, 2, 43, "£%d", mainPlayer.bank);    
+                                                wrefresh(bankMenu);
+                                            }
+                                           }
+                                          }
+                                         }
+                                if(bankMenuInput == "Withdraw")
+                                {
+                                    echo();
+                                    curs_set(1);
+                                    wrefresh(bankMenu);
+                                    mvwscanw(bankMenu, 14, 2, "%d", &withdrawAmount);
+                                    wrefresh(bankMenu);
+                                    noecho();
+                                    curs_set(0);
+                                    refresh();
+                                    if(withdrawAmount <= mainPlayer.bank)
+                                    {
+                                      if(mainPlayer.cash + withdrawAmount>0)
+                                      {
+                                          if(withdrawAmount>0)
+                                          {
+                                            mainPlayer.bank-=withdrawAmount;
+                                            mainPlayer.cash+= withdrawAmount-(withdrawAmount*0.2);
+                                            mvwprintw(bankMenu, 2, 43, "£%d", mainPlayer.bank);    
+                                            wrefresh(bankMenu);
+                                          }
+                                          else
+                                          {
+                                              
+                                          }
+                                      }
+                                    }
+                                }
+                                wrefresh(bankMenu);
+                                        }
+                                       }
 
 						wrefresh(secondScreenWin);
 					}
@@ -760,6 +1061,27 @@ int main()
 		}
 
 	}
-
+    int rc;
+    sqlite3 *db;
+    sqlite3_stmt * stmt;
+    mainPlayer.lastOnline = time(nullptr);
+    rc = sqlite3_open("stux_base.db", &db);
+    string sqlSelect = "UPDATE mainGamePlayer SET cash = ?, lastOnline = ?, bank = ? WHERE userName = ?";
+    sqlite3_prepare(db, sqlSelect.c_str(), sqlSelect.size(), &stmt, nullptr);
+    sqlite3_bind_int(stmt, 1, mainPlayer.cash);
+    sqlite3_bind_int(stmt, 2, mainPlayer.lastOnline);
+    sqlite3_bind_int(stmt, 3, mainPlayer.bank);
+    sqlite3_bind_text(stmt, 4, mainPlayer.userName.c_str(), mainPlayer.userName.size(), NULL);
+    sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
+    sqlSelect = "UPDATE dataMining SET perClick = ?, passive = ?  WHERE userName = ?";         
+    sqlite3_prepare(db, sqlSelect.c_str(), sqlSelect.size(), &stmt, nullptr);
+    sqlite3_bind_int(stmt, 1, mainPlayer.perClick);
+    sqlite3_bind_int(stmt, 2, mainPlayer.passive);
+    sqlite3_bind_text(stmt, 3, mainPlayer.userName.c_str(), mainPlayer.userName.size(), NULL);
+    sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+    cout<< mainPlayer.cash<<' '<<mainPlayer.userName<<' '<<mainPlayer.bank<<endl;
 	return 0;
 }
