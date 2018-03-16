@@ -1,3 +1,4 @@
+//g++  minigame.cpp -lncurses -lsqlite3 -o game1  - compiles the code
 #include "money_rush.h"
 #include "sqlite3.h"
 
@@ -15,7 +16,7 @@ int main()
     sqlite3 *db;
     rc = sqlite3_open("stux_base.db", &db);
     sqlite3_stmt * stmt;
-    string sqlSelect = "UPDATE minigameScores SET patrykGame = (?3) WHERE name = 'Nick'";
+    string sqlSelect = "UPDATE minigameScores SET patrykGame = (?3) WHERE userName = 'Nick'";
     sqlite3_prepare(db, sqlSelect.c_str(), sqlSelect.size(), &stmt, nullptr);
     sqlite3_bind_int(stmt, 3, finalpoints);
     sqlite3_step(stmt);
